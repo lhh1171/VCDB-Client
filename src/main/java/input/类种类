@@ -1,0 +1,237 @@
+curl文档
+一.ddl命令
+1.创建数据库
+PUT          http://ip:端口/dbname
+2.删除数据库
+DELETE      http://ip:端口/dbname
+
+2.创建表(SQL字段类型   char(1字节)  double(8字节) N*string(4字节) int(4字节) long(8字节) long long(16字节))
+PUT    http://ip:端口/dbname/tab_name/版本
+{
+"column_family":
+   [
+    {
+        "cf_name": "列族名称 ",(必要)
+ 		"type": "类型",(必要)
+		"min"：最小长度,(不必要)
+		"max"：最大长度,(不必要)
+		"unique":是否唯一,(不必要)
+    },
+    ......
+   ]
+}
+
+
+3.修改表结构(更新)
+POST http://ip:端口/dbname/tab_name/_alter
+{
+    "alter_cells":
+        [
+ 	        {
+ 	         	//put时，cf_name必要，old-cf_name不必要
+             	//delete时，cf_name不必要，old-cf_name必要
+             	//update时，cf_name必要，old-cf_name必要
+                "cf_name":"列族名称",
+                "old-cf_name":"列族名称",
+ 			    "method":"put/delete/insert",
+ 			},
+ 			{
+
+ 			}
+          .......
+        ]
+}
+
+4.删除表
+
+DELETE http://ip:端口/dbname/tab_name
+
+二.dml命令
+
+1.开启事务
+POST     http://ip:端口/_open
+{
+   "explainValue(操作解释)":  "What do you want?"）(必要)
+}
+
+2.关闭事务
+POST     http://ip:端口/_close
+
+
+3.版本合并
+
+POST http://ip:端口/dbname/tab_name/_merge
+{
+
+   "Version_terms(条件)":
+   [
+        {
+            "rowKey":"行建名"(必要)
+            "version-from":"要合并版本"(必要)
+            "version-to":"合并后版本"(必要)
+        },
+      .......
+   ]
+}
+
+4.提取某一版本到最新版本
+
+POST http://ip:端口/dbname/tab_name/_use
+{
+    "rowKey":"行建名"(必要)
+    "version":"版本"(必要)
+}
+
+5.删除某一版本
+
+POST http://ip:端口/dbname/tab_name/delete_version
+{
+    "rowKey":"行建名"(必要)
+    "version":"版本"(必要)
+}
+
+6.查看全部版本
+post http://ip:端口/dbname/tab_name/_showVersion
+{
+    "rowKey":"行建名"(必要)
+}
+
+
+
+7.基本查询流程
+#语法
+post http://ip:端口/dbname/tab_name/_search
+{
+    "limit":9(不必要)
+    "cf_names":["rowKey","id","name","age",*](必要)
+    "terms(条件)":
+        [
+            {
+                "cf_name":"列族名称",(必要)
+                "c_name":"StudentAge",(不必要)
+                "max": "最大值",(不必要)
+                "equivalence":"相等的值",(不必要)
+                "min":"最小值",(不必要)
+                "like": "模糊(%表示多个字符，_表示一个字符)"(不必要)
+            },
+            ......
+        ]
+    "orders":
+    [
+        {
+            'cf_name':'xxx',
+            'sort':'asc/desc'
+        },
+        ......
+    ]
+	"Aggregate(聚合)":
+	    [
+            {
+            "Aggregate_name":avg/min/max/sum,(必要)
+            column:"StudentAge",(必要)
+            as:“xxx”(必要)
+            },
+        .....
+        ]
+}
+
+
+9.基本添加流程
+#语法
+PUT http://ip:端口/dbname/tab_name
+{
+    "rowKey":"唯一标识",
+    "values":
+        [
+            {
+                "cf_name":"cf1",(必要)
+                "c_name":"c1",(必要)
+                "value":"xxx"(必要)
+            },
+         .....
+        ]
+}
+
+10.基本删除流程
+post http://ip:端口/dbname/tab_name /_delete
+{
+    "cf_names":[rowKey,id,name,age，*](必要)
+    "terms":
+        [
+            {
+                "cf_name":"列族名称",(必要)
+                "c_name":"StudentAge",(不必要)
+                "max": "最大值",(不必要)
+                "equivalence":"相等的值",(不必要)
+                "min":"最小值",(不必要)
+                "like": "模糊(%表示多个字符，_表示一个字符)"(不必要)
+            },
+           ......
+        ]
+}
+
+
+11.基本跟新流程
+POST  http://ip:端口/dbname/tab_name /_update
+{
+    "rowKey":"sss"
+    "terms":
+    [
+        {
+            "cf_name":"列族名称",(必要)
+            "c_name":"StudentAge",(不必要)
+            "max": "最大值",(不必要)
+            "equivalence":"相等的值",(不必要)
+            "min":"最小值",(不必要)
+            "like": "模糊(%表示多个字符，_表示一个字符)"(不必要)
+        },
+       .......
+    ]
+    "values":
+    [
+        {
+             "cf_name":"cf1",(必要)
+             "c_name":"c1",(必要)
+             "value":"xxx"(必要)
+        },
+         .....
+    ]
+}
+
+
+
+
+12.多表查询
+post http://ip:端口/dbname/tab_name /_mget
+{
+    "limit":9(不必要)
+	"j_tables"：
+        [
+            {
+                tab_name:"t_name"，(必要)
+                method:inner/left/right/full(必要)
+            },
+            ......
+        ]
+   "cf_names":[rowKey,id,name,age，*](必要)
+    "terms":
+        [
+            {
+               "cf_name":"列族名称",(必要)
+               "c_name":"StudentAge",(不必要)
+               "max": "最大值",(不必要)
+               "equivalence":"相等的值",(不必要)
+               "min":"最小值",(不必要)
+               "like": "模糊(%表示多个字符，_表示一个字符)"(不必要)
+            },
+                ......
+        ]
+        "orders":
+            [
+                {
+                    'cf_name':'xxx',
+                    'sort':'asc/desc'
+                },
+                ......
+            ]
+}
