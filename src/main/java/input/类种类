@@ -6,7 +6,7 @@ PUT          http://ip:端口/dbname
 DELETE      http://ip:端口/dbname
 
 2.创建表(SQL字段类型   char(1字节)  double(8字节) N*string(4字节) int(4字节) long(8字节) long long(16字节))
-PUT    http://ip:端口/dbname/tab_name/版本
+PUT    http://ip:端口/dbname/tab_name
 {
 "column_family":
    [
@@ -138,7 +138,7 @@ post http://ip:端口/dbname/tab_name/_search
 
 9.基本添加流程
 #语法
-PUT http://ip:端口/dbname/tab_name
+Post http://ip:端口/dbname/tab_name/_insert
 {
     "rowKey":"唯一标识",
     "values":
