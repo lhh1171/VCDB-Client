@@ -2,9 +2,10 @@ package input;
 
 
 
-import input.input.ENTITY.JTableCell;
-import input.input.ENTITY.Order;
-import input.input.ENTITY.TermCell;
+
+import input.ENTITY.JTableCell;
+import input.ENTITY.Order;
+import input.ENTITY.TermCell;
 
 import java.util.List;
 /**

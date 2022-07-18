@@ -1,6 +1,7 @@
 package input.SQLAnalyzer;
 
 import input.ActionEntity;
+import input.MultiSearch;
 import input.RequestEntity;
 
 public class EX {
@@ -180,10 +181,10 @@ public class EX {
         String[] postUrl=actionEntity.getMethod().split("/");
         switch (postUrl.length){
             case 2:
-                if ("_open".equals(postUrl[1])){
+                if ("_open".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getOpenTransaction(actionEntity);
                     openTransaction(requestEntity);
-                }else if ("_close".equals(postUrl[1])){
+                }else if ("_close".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getCloseTransaction(actionEntity);
                     closeTransaction(requestEntity);
                 }else {
@@ -191,31 +192,31 @@ public class EX {
                 }
                 break;
             case 3:
-                if ("_insert".equals(postUrl[2])){
+                if ("_insert".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getPutCells();
                     putCells(requestEntity);
-                }else if ("alter".equals(postUrl[2])){
+                }else if ("alter".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getAlterTable(actionEntity);
                     alterTable(requestEntity);
-                }else if ("_merge".equals(postUrl[2])){
+                }else if ("_merge".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getMergeVersion(actionEntity);
                     mergeVersion(requestEntity);
-                }else if ("_use".equals(postUrl[2])){
+                }else if ("_use".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getUseVersion(actionEntity);
                     useVersion(requestEntity);
-                }else if ("_showVersion".equals(postUrl[2])){
+                }else if ("_showVersion".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getShowVersion(actionEntity);
                     showVersion(requestEntity);
-                }else if ("_search".equals(postUrl[2])){
+                }else if ("_search".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getSingleSearch(actionEntity);
                     singleSearch(requestEntity);
-                }else if ("_delete".equals(postUrl[2])){
+                }else if ("_delete".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getDeleteCells(actionEntity);
                     deleteCells(requestEntity);
-                }else if ("_update".equals(postUrl[2])){
+                }else if ("_update".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getUpdateCells(actionEntity);
                     updateCells(requestEntity);
-                }else if ("_mget".equals(postUrl[2])){
+                }else if ("_mget".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getMultiSearch(actionEntity);
                     multiSearch(requestEntity);
                 } else {
@@ -241,6 +242,7 @@ public class EX {
     }
 
     private static RequestEntity getMultiSearch(ActionEntity actionEntity) {
+        MultiSearch multiSearch=new MultiSearch();
     }
 
     private static RequestEntity getUpdateCells(ActionEntity actionEntity) {
@@ -274,15 +276,15 @@ public class EX {
     }
 
     private static boolean isPost(ActionEntity actionEntity) {
-        return "POST".equals(actionEntity.getMethod());
+        return "POST".equalsIgnoreCase(actionEntity.getMethod());
     }
 
     private static boolean isDelete(ActionEntity actionEntity) {
-        return "DELETE".equals(actionEntity.getMethod());
+        return "DELETE".equalsIgnoreCase(actionEntity.getMethod());
     }
 
     private static boolean isPut(ActionEntity actionEntity) {
-        return "PUT".equals(actionEntity.getMethod());
+        return "PUT".equalsIgnoreCase(actionEntity.getMethod());
     }
 
     public static void main(String[] args) {
