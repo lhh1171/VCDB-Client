@@ -1,8 +1,8 @@
 package input;
 
 
-import input.input.ENTITY.TermCell;
-import input.input.ENTITY.Value;
+import input.ENTITY.TermCell;
+import input.ENTITY.Value;
 
 import java.util.List;
 
@@ -14,5 +14,13 @@ public class UpdateCells extends RequestEntity {
     private List<TermCell> terms;
 
     private List<Value> values;
+
+    public void setTerms(List<TermCell> terms) {
+        this.terms = terms;
+    }
+
+    public void setValues(List<Value> values) {
+        this.values = values;
+    }
 
 }

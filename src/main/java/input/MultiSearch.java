@@ -20,5 +20,22 @@ public class MultiSearch extends RequestEntity {
     private List<TermCell> terms;
 
     private List<Order> orders;
+    public void setJ_tables(List<JTableCell> j_tables) {
+        this.j_tables = j_tables;
+    }
+
+    public void setCf_names(List<String> cf_names) {
+        this.cf_names = cf_names;
+    }
+
+    public void setTerms(List<TermCell> terms) {
+        this.terms = terms;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
+
 
 }

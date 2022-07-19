@@ -9,7 +9,22 @@ public class JTableCell {
      * method : inner/left/right/full
      */
 
-    private String tabname;
+    private String tableName;
     private String method;
 
+    public String getTableName() {
+        return tableName;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
 }

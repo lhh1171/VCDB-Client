@@ -7,7 +7,7 @@ import java.util.Map;
 public class ActionEntity {
     String Method;
     String Url;
-    HashMap<String,String> RegularAttribute;
+    HashMap<String,Object> RegularAttribute;
     Map <String,List<HashMap<String,String>>> CompoundAttribute;
 
     public String getMethod() {
@@ -18,7 +18,7 @@ public class ActionEntity {
         return Url;
     }
 
-    public HashMap<String, String> getRegularAttribute() {
+    public HashMap<String, Object> getRegularAttribute() {
         return RegularAttribute;
     }
 

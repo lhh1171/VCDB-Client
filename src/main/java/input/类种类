@@ -229,8 +229,8 @@ post http://ip:端口/dbname/tab_name /_mget
         "orders":
             [
                 {
-                    'cf_name':'xxx',
-                    'sort':'asc/desc'
+                    'cf_name':'xxx',(必要)
+                    'sort':'asc/desc'(必要)
                 },
                 ......
             ]
