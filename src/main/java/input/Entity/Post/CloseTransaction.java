@@ -1,4 +1,4 @@
-package input;
+package input.Entity.Post;
 /**
  * @author : wyy
  * @Date : 2022.7.11

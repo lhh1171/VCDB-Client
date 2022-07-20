@@ -1,11 +1,11 @@
-package input;
+package input.Entity.Post;
 
 
 
 
-import input.ENTITY.JTableCell;
-import input.ENTITY.Order;
-import input.ENTITY.TermCell;
+import input.Entity.Cell.JTableCell;
+import input.Entity.Cell.Order;
+import input.Entity.Cell.TermCell;
 
 import java.util.List;
 /**

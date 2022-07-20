@@ -1,13 +1,13 @@
-package input.SQLAnalyzer;
+package input.Analyzer;
 
-import input.ActionEntity;
-import input.ENTITY.JTableCell;
-import input.ENTITY.Order;
-import input.ENTITY.TermCell;
-import input.ENTITY.Value;
-import input.MultiSearch;
-import input.RequestEntity;
-import input.UpdateCells;
+import input.Entity.Cell.*;
+import input.Entity.Delete.ColumnFamilyCell;
+import input.Entity.Delete.DeleteCells;
+import input.Entity.Delete.DeleteDB;
+import input.Entity.Delete.DeleteTable;
+import input.Entity.Post.*;
+import input.Entity.Put.CreateDB;
+import input.Entity.Put.CreateTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,6 +119,7 @@ public class EX {
 //        }
 //    }
     public static void DFA2(ActionEntity actionEntity){
+        //用枚举替换
         if (isPut(actionEntity)) {
             MethodState = 1;
         } else if (isDelete(actionEntity)) {
@@ -148,21 +149,114 @@ public class EX {
         switch (putUrl.length){
             case 2:
                 requestEntity=getCreateDB(actionEntity);
-                createDB(requestEntity);
+//                createDB(requestEntity);
                 break;
             case 3:
                 requestEntity=getCreateTable(actionEntity);
-                createTable(requestEntity);
+//                createTable(requestEntity);
                 break;
             default:
                 System.out.println("the URL Segment is error"+"给出提示（把PUT所有的命令返还给他");
         }
     }
 
+    public static void setBaseAttribute(RequestEntity requestEntity,ActionEntity actionEntity){
+        requestEntity.setUri(actionEntity.getUrl());
+        requestEntity.setMethod(actionEntity.getMethod());
+    }
     private static RequestEntity getCreateTable(ActionEntity actionEntity) {
+        CreateTable createTable=new CreateTable();
+        setBaseAttribute(createTable,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("column_family".equalsIgnoreCase(entry.getKey())){
+                createTable.setColumn_family(selectColumn_family(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
+        return createTable;
+    }
+
+    private static List<ColumnFamilyCell> selectColumn_family(List<HashMap<String, String>> value) {
+        List<ColumnFamilyCell> columnFamilyCells=new ArrayList<ColumnFamilyCell>();
+        for (HashMap<String,String> kv: value){
+            ColumnFamilyCell columnFamilyCell=new ColumnFamilyCell();
+            for (Map.Entry<String,String> cell:kv.entrySet()){
+                if ("cf_name".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getCf_name()==null){
+                        columnFamilyCell.setCf_name(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置cf_name属性");
+                    }
+                }else if ("type".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getType()==null){
+                        columnFamilyCell.setType(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置type属性");
+                    }
+                }else if ("min".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getMin()==Double.MIN_VALUE){
+                        columnFamilyCell.setMin(Double.parseDouble(cell.getValue()));
+                    } else {
+                        System.err.println("报错重复设置min属性");
+                    }
+                }else if ("max".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getMax()==Double.MAX_VALUE){
+                        columnFamilyCell.setMax(Double.parseDouble(cell.getValue()));
+                    } else {
+                        System.err.println("报错重复设置max属性");
+                    }
+                }else if ("isNull".equalsIgnoreCase(cell.getKey())){
+                    if (!columnFamilyCell.isNull()){
+                        columnFamilyCell.setNull(Boolean.parseBoolean(cell.getValue()));
+                    } else {
+                        System.err.println("报错重复设置isNull属性");
+                    }
+                }else if ("unique".equalsIgnoreCase(cell.getKey())){
+                    if (!columnFamilyCell.isUnique()){
+                        columnFamilyCell.setUnique(Boolean.parseBoolean(cell.getValue()));
+                    } else {
+                        System.err.println("报错重复设置unique属性");
+                    }
+                }else if ("Version".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getVersion()==Integer.MAX_VALUE){
+                        columnFamilyCell.setVersion(Integer.parseInt(cell.getValue()));
+                    } else {
+                        System.err.println("报错重复设置c_name属性");
+                    }
+                }else if ("method".equalsIgnoreCase(cell.getKey())){
+                    if (columnFamilyCell.getType()==null){
+                        columnFamilyCell.setType(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置method属性");
+                    }
+                }else {
+                    System.err.println("出现未知属性，打印key");
+                }
+            }
+            //TODO检查termCell必要属性是否为空
+            if (isNull(columnFamilyCell.getCf_name())){
+                columnFamilyCells.add(columnFamilyCell);
+            }else {
+                System.err.println("columnFamilyCell缺少必要属性");
+            }
+        }
+        return columnFamilyCells;
     }
 
     private static RequestEntity getCreateDB(ActionEntity actionEntity) {
+        CreateDB createDB=new CreateDB();
+        setBaseAttribute(createDB,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return createDB;
     }
 
 
@@ -171,11 +265,12 @@ public class EX {
         switch (deleteUrl.length){
             case 2:
                 requestEntity=getDeleteDB(actionEntity);
-                deleteDB(requestEntity);
+//                putCell(Node);
+//                deleteDB(requestEntity);
                 break;
             case 3:
                 requestEntity=getDeleteTable(actionEntity);
-                deleteTable(requestEntity);
+//                deleteTable(requestEntity);
                 break;
             default:
                 System.out.println("the URL Segment is error"+"给出提示（把Delete开头的所有的命令返还给他");
@@ -183,11 +278,27 @@ public class EX {
     }
 
     private static RequestEntity getDeleteTable(ActionEntity actionEntity) {
-        return null;
+        DeleteTable deleteTable=new DeleteTable();
+        setBaseAttribute(deleteTable,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return deleteTable;
     }
 
     private static RequestEntity getDeleteDB(ActionEntity actionEntity) {
-        return null;
+        DeleteDB deleteDB=new DeleteDB();
+        setBaseAttribute(deleteDB,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return deleteDB;
     }
 
     private static void handlePost(ActionEntity actionEntity) {
@@ -196,42 +307,42 @@ public class EX {
             case 2:
                 if ("_open".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getOpenTransaction(actionEntity);
-                    openTransaction(requestEntity);
-                }else if ("_close".equalsIgnoreCase(postUrl[1])){
+//                    openTransaction(requestEntity);
+                } else if ("_close".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getCloseTransaction(actionEntity);
-                    closeTransaction(requestEntity);
-                }else {
+//                    closeTransaction(requestEntity);
+                } else {
                     System.out.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
                 }
                 break;
             case 3:
                 if ("_insert".equalsIgnoreCase(postUrl[2])){
-                    requestEntity=getPutCells();
-                    putCells(requestEntity);
+                    requestEntity=getPutCells(actionEntity);
+//                    putCells(requestEntity);
                 }else if ("alter".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getAlterTable(actionEntity);
-                    alterTable(requestEntity);
+//                    alterTable(requestEntity);
                 }else if ("_merge".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getMergeVersion(actionEntity);
-                    mergeVersion(requestEntity);
+//                    mergeVersion(requestEntity);
                 }else if ("_use".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getUseVersion(actionEntity);
-                    useVersion(requestEntity);
+//                    useVersion(requestEntity);
                 }else if ("_showVersion".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getShowVersion(actionEntity);
-                    showVersion(requestEntity);
+//                    showVersion(requestEntity);
                 }else if ("_search".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getSingleSearch(actionEntity);
-                    singleSearch(requestEntity);
+//                    singleSearch(requestEntity);
                 }else if ("_delete".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getDeleteCells(actionEntity);
-                    deleteCells(requestEntity);
+//                    deleteCells(requestEntity);
                 }else if ("_update".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getUpdateCells(actionEntity);
-                    updateCells(requestEntity);
+//                    updateCells(requestEntity);
                 }else if ("_mget".equalsIgnoreCase(postUrl[2])){
                     requestEntity=getMultiSearch(actionEntity);
-                    multiSearch(requestEntity);
+//                    multiSearch(requestEntity);
                 } else {
                     System.err.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
                 }
@@ -372,8 +483,7 @@ public class EX {
 
     private static RequestEntity getUpdateCells(ActionEntity actionEntity) {
         UpdateCells updateCells=new UpdateCells();
-        updateCells.setUri(actionEntity.getUrl());
-        updateCells.setMethod("POST");
+        setBaseAttribute(updateCells,actionEntity);
         if (actionEntity.getRegularAttribute()!=null){
             System.err.println("出现未知属性，打印key");
         }
@@ -483,39 +593,261 @@ public class EX {
     }
 
     private static RequestEntity getDeleteCells(ActionEntity actionEntity) {
-        return null;
+        DeleteCells deleteCells=new DeleteCells();
+        setBaseAttribute(deleteCells,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("cf_names".equalsIgnoreCase(cfs.getKey())){
+                List<String> cf_names=castList(cfs.getValue(),String.class);
+                if (cf_names.size()==0){
+                    System.err.println("报错提示cf_names为空");
+                }
+                deleteCells.setCf_names(cf_names);
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("terms".equalsIgnoreCase(entry.getKey())){
+                deleteCells.setTerms(selectTerms(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
+        return deleteCells;
     }
 
     private static RequestEntity getSingleSearch(ActionEntity actionEntity) {
-        return null;
+        SingleSearch singleSearch=new SingleSearch();
+        setBaseAttribute(singleSearch,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("cf_names".equalsIgnoreCase(cfs.getKey())){
+                List<String> cf_names=castList(cfs.getValue(),String.class);
+                if (cf_names.size()==0){
+                    System.err.println("报错提示cf_names为空");
+                }
+                singleSearch.setCf_names(cf_names);
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("terms".equalsIgnoreCase(entry.getKey())){
+                singleSearch.setTerms(selectTerms(entry.getValue()));
+            }else if ("orders".equalsIgnoreCase(entry.getKey())){
+                singleSearch.setOrders(selectOrders(entry.getValue()));
+            }else if ("aggregate".equalsIgnoreCase(entry.getKey())){
+                singleSearch.setAggregate(selectAggregate(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
+        return singleSearch;
+    }
+
+    private static List<Aggregate> selectAggregate(List<HashMap<String, String>> value) {
+        List<Aggregate> aggregates=new ArrayList<Aggregate>();
+        for (HashMap<String,String> kv: value){
+            Aggregate aggregate=new Aggregate();
+            for (Map.Entry<String,String> cell:kv.entrySet()){
+                if ("c_name".equalsIgnoreCase(cell.getKey())){
+                    if (aggregate.getC_name()==null){
+                        aggregate.setC_name(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置cf_name属性");
+                    }
+                }else if ("function".equalsIgnoreCase(cell.getKey())){
+                    if (aggregate.getFunction()==null){
+                        aggregate.setFunction(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置c_name属性");
+                    }
+                }else if ("as".equalsIgnoreCase(cell.getKey())){
+                    if (aggregate.getAs()==null){
+                        aggregate.setAs(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置size属性");
+                    }
+                }else {
+                    System.err.println("出现未知属性，打印key");
+                }
+            }
+            //TODO检查termCell必要属性是否为空
+            if (isNull(aggregate.getC_name())){
+                aggregates.add(aggregate);
+            }if (isNull(aggregate.getFunction())){
+                aggregates.add(aggregate);
+            }if (isNull(aggregate.getAs())){
+                aggregates.add(aggregate);
+            }else {
+                System.err.println("aggregate缺少必要属性");
+            }
+        }
+        return aggregates;
     }
 
     private static RequestEntity getShowVersion(ActionEntity actionEntity) {
-        return null;
+        ShowVersion showVersion=new ShowVersion();
+        setBaseAttribute(showVersion,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("rowKey".equalsIgnoreCase(cfs.getKey())){
+                showVersion.setRowKey((String)cfs.getValue());
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return showVersion;
     }
 
     private static RequestEntity getUseVersion(ActionEntity actionEntity) {
-        return null;
+        UseVersion useVersion=new UseVersion();
+        setBaseAttribute(useVersion,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("rowKey".equalsIgnoreCase(cfs.getKey())){
+                useVersion.setRowKey((String)cfs.getValue());
+            }if ("Version".equalsIgnoreCase(cfs.getKey())){
+                useVersion.setVersion((Integer.parseInt((String)cfs.getValue())));
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return useVersion;
     }
 
     private static RequestEntity getMergeVersion(ActionEntity actionEntity) {
-        return null;
+        MergeVersion mergeVersion=new MergeVersion();
+        setBaseAttribute(mergeVersion,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("rowKey".equalsIgnoreCase(cfs.getKey())){
+                mergeVersion.setRowKey((String)cfs.getValue());
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("Terms".equalsIgnoreCase(entry.getKey())){
+                mergeVersion.setTerms(selectTerms(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
+        return mergeVersion;
     }
 
     private static RequestEntity getAlterTable(ActionEntity actionEntity) {
+        AlterTable alterTable=new AlterTable();
+        setBaseAttribute(alterTable,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("alter_cells".equalsIgnoreCase(entry.getKey())){
+                alterTable.setAlter_cells(selectAlter(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
         return null;
     }
 
-    private static RequestEntity getPutCells() {
-        return null;
+    private static List<AlterCell> selectAlter(List<HashMap<String, String>> value) {
+        List<AlterCell> alterCells=new ArrayList<AlterCell>();
+        for (HashMap<String,String> kv: value){
+            AlterCell alterCell=new AlterCell();
+            for (Map.Entry<String,String> cell:kv.entrySet()){
+                if ("cfName".equalsIgnoreCase(cell.getKey())){
+                    if (alterCell.getCfName()==null){
+                        alterCell.setCfName(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置cfName属性");
+                    }
+                }else if ("old_cfName".equalsIgnoreCase(cell.getKey())){
+                    if (alterCell.getOld_cfName()==null){
+                        alterCell.setOld_cfName(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置old_cfName属性");
+                    }
+                }else if ("method".equalsIgnoreCase(cell.getKey())){
+                    if (alterCell.getMethod()==null){
+                        alterCell.setMethod(cell.getValue());
+                    } else {
+                        System.err.println("报错重复设置method属性");
+                    }
+                }else {
+                    System.err.println("出现未知属性，打印key");
+                }
+            }
+            //TODO检查termCell必要属性是否为空
+            if ("put".equalsIgnoreCase(alterCell.getMethod())){
+                if (isNull(alterCell.getCfName())&&!isNull(alterCell.getOld_cfName())){
+                    alterCells.add(alterCell);
+                }
+            }else if ("delete".equalsIgnoreCase(alterCell.getMethod())){
+                if (!isNull(alterCell.getCfName())&&isNull(alterCell.getOld_cfName())){
+                    alterCells.add(alterCell);
+                }
+            }else if ("update".equalsIgnoreCase(alterCell.getMethod())){
+                if (isNull(alterCell.getCfName())&&isNull(alterCell.getOld_cfName())){
+                    alterCells.add(alterCell);
+                }
+            }else {
+                System.err.println("aggregate缺少必要属性");
+            }
+        }
+        return alterCells;
+    }
+
+    private static RequestEntity getPutCells(ActionEntity actionEntity) {
+        PutCells putCells=new PutCells();
+        setBaseAttribute(putCells,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("rowKey".equalsIgnoreCase(cfs.getKey())){
+                putCells.setRowKey((String)cfs.getValue());
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        for (HashMap.Entry<String, List<HashMap<String, String>>> entry : actionEntity.getCompoundAttribute().entrySet()) {
+            if ("values".equalsIgnoreCase(entry.getKey())){
+                putCells.setValues(selectValues(entry.getValue()));
+            } else {
+                System.err.println("把key打印出来，说明它不属于关键字");
+            }
+        }
+        return putCells;
     }
 
     private static RequestEntity getCloseTransaction(ActionEntity actionEntity) {
-        return null;
+        CloseTransaction closeTransaction=new CloseTransaction();
+        setBaseAttribute(closeTransaction,actionEntity);
+        if (actionEntity.getRegularAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return closeTransaction;
     }
 
     private static RequestEntity getOpenTransaction(ActionEntity actionEntity) {
-        return null;
+        OpenTransaction openTransaction=new OpenTransaction();
+        setBaseAttribute(openTransaction,actionEntity);
+        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
+            if ("explainValue".equalsIgnoreCase(cfs.getKey())){
+                openTransaction.setExplainValue((String)cfs.getValue());
+            }else {
+                System.err.println("出现未知属性，打印key");
+            }
+        }
+        if (actionEntity.getCompoundAttribute()!=null){
+            System.err.println("出现未知属性，打印key");
+        }
+        return openTransaction;
     }
 
     private static boolean isPost(ActionEntity actionEntity) {
@@ -530,8 +862,8 @@ public class EX {
         return "PUT".equalsIgnoreCase(actionEntity.getMethod());
     }
 
-    public static void main(String[] args) {
-        ActionEntity actionEntity=new ActionEntity();
-        String[] split = actionEntity.getMethod().split("/");
-    }
+//    public static void main(String[] args) {
+//        ActionEntity actionEntity=new ActionEntity();
+//        String[] split = actionEntity.getMethod().split("/");
+//    }
 }

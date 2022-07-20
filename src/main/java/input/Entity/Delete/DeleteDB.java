@@ -1,5 +1,7 @@
-package input;
+package input.Entity.Delete;
 
+
+import input.Entity.Post.RequestEntity;
 
 /**
  * @author : wyy

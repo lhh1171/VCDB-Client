@@ -1,4 +1,4 @@
-package input;
+package input.Entity.Post;
 /**
  * @author : wyy
  * @Date : 2022.7.11
@@ -6,4 +6,7 @@ package input;
 public class OpenTransaction extends RequestEntity{
     private String explainValue;
 
+    public void setExplainValue(String explainValue) {
+        this.explainValue = explainValue;
+    }
 }

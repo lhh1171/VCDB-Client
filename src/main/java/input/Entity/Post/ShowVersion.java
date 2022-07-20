@@ -1,4 +1,4 @@
-package input;
+package input.Entity.Post;
 
 
 
@@ -9,4 +9,7 @@ package input;
 public class ShowVersion extends RequestEntity {
     private String rowKey;
 
+    public void setRowKey(String rowKey) {
+        this.rowKey = rowKey;
+    }
 }

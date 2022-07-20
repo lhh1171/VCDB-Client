@@ -1,4 +1,4 @@
-package input;
+package input.Entity.Post;
 
 import java.util.HashMap;
 import java.util.List;

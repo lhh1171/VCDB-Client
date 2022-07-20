@@ -1,8 +1,8 @@
-package input;
+package input.Entity.Post;
 
 
-import input.ENTITY.TermCell;
-import input.ENTITY.Value;
+import input.Entity.Cell.TermCell;
+import input.Entity.Cell.Value;
 
 import java.util.List;
 

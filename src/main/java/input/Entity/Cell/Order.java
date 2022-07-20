@@ -1,4 +1,4 @@
-package input.ENTITY;
+package input.Entity.Cell;
 
 public class Order {
     private String cf_name;
