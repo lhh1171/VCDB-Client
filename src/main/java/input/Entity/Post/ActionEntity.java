@@ -8,7 +8,15 @@ public class ActionEntity {
     String Method;
     String Url;
     HashMap<String,Object> RegularAttribute;
-    Map <String,List<HashMap<String,String>>> CompoundAttribute;
+    Map <String,List<HashMap<String, String>>> CompoundAttribute;
+
+    public ActionEntity() {
+    }
+
+    public ActionEntity(String method, String url) {
+        Method = method;
+        Url = url;
+    }
 
     public String getMethod() {
         return Method;
