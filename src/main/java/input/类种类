@@ -208,12 +208,12 @@ post http://ip:端口/dbname/tab_name /_mget
 	"j_tables"：
         [
             {
-                tab_name:"t_name"，(必要)
-                method:inner/left/right/full(必要)
+                "tab_name":"t_name"，(必要)
+                "method":inner/left/right/full(必要)
             },
             ......
         ]
-   "cf_names":[rowKey,id,name,age，*](必要)
+   "cf_names":["rowKey","id",name,age，*](必要)
     "terms":
         [
             {
