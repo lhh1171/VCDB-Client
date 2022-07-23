@@ -1,6 +1,7 @@
 package input.Server;
 
 
+import input.Analyzer.EX;
 import input.Entity.Post.ActionEntity;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -30,6 +31,7 @@ public class JsonToRestFulEntityHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ActionEntity actionEntity= toRestfulEntity(msg);
         System.out.println("server接收到\n"+actionEntity);
+        EX.DFA2(actionEntity);
         ctx.fireChannelActive();
     }
     public ActionEntity toRestfulEntity(Object msg) throws JSONException {
@@ -62,7 +64,12 @@ public class JsonToRestFulEntityHandler extends ChannelInboundHandlerAdapter {
         if (actionEntity.containKey(key)){
             System.err.println("key重复");
         }
-        actionEntity.addRegularAttribute(key,o);
+        if (o instanceof String){
+            actionEntity.addRegularAttribute(key,o);
+        }else {
+            actionEntity.addRegularAttribute(key,String.valueOf(o));
+        }
+
     }
 
     private void addCompoundAttribute(String key,JSONArray array, ActionEntity actionEntity) throws JSONException {
@@ -84,13 +91,14 @@ public class JsonToRestFulEntityHandler extends ChannelInboundHandlerAdapter {
         }else {
             List<HashMap<String, String>> hashMapList=new ArrayList<HashMap<String, String>>();
             for(int i=0;i<array.length();i++) {
+                String key2;
                 try{
                     HashMap<String, String> hashMap=new HashMap<String, String>();
                     JSONObject jo=array.getJSONObject(i);
                     Iterator iterator = jo.keys();
                     while(iterator.hasNext()){
-                        key = (String) iterator.next();
-                        hashMap.put(key,jo.getString(key));
+                        key2 = (String) iterator.next();
+                        hashMap.put(key2,jo.getString(key2));
                     }
                     hashMapList.add(hashMap);
                 }catch (JSONException ignored){

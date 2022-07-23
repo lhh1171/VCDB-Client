@@ -13,6 +13,7 @@ import java.util.List;
  * @Date : 2022.7.11
  */
 public class MultiSearch extends RequestEntity {
+    private int limit;
     private List<JTableCell> j_tables;
 
     private List<String> cf_names;
@@ -37,5 +38,7 @@ public class MultiSearch extends RequestEntity {
     }
 
 
-
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 }

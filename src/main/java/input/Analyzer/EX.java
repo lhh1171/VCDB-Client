@@ -142,6 +142,7 @@ public class EX {
     }
 
     private static void MethodGetErr(ActionEntity actionEntity) {
+        System.err.println("方法错误");
     }
 
     private static void handlePut(ActionEntity actionEntity) {
@@ -149,10 +150,12 @@ public class EX {
         switch (putUrl.length){
             case 2:
                 requestEntity=getCreateDB(actionEntity);
+                System.out.println("createDB----------");
 //                createDB(requestEntity);
                 break;
             case 3:
                 requestEntity=getCreateTable(actionEntity);
+                System.out.println("createTable---------");
 //                createTable(requestEntity);
                 break;
             default:
@@ -266,10 +269,12 @@ public class EX {
             case 2:
                 requestEntity=getDeleteDB(actionEntity);
 //                putCell(Node);
+                System.out.println("deleteDB------------");
 //                deleteDB(requestEntity);
                 break;
             case 3:
                 requestEntity=getDeleteTable(actionEntity);
+                System.out.println("deleteTable----------------");
 //                deleteTable(requestEntity);
                 break;
             default:
@@ -302,50 +307,62 @@ public class EX {
     }
 
     private static void handlePost(ActionEntity actionEntity) {
-        String[] postUrl=actionEntity.getMethod().split("/");
+        String[] postUrl=actionEntity.getUrl().split("/");
         switch (postUrl.length){
-            case 2:
+            case 3:
                 if ("_open".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getOpenTransaction(actionEntity);
+                    System.out.println("openTransaction---------------");
 //                    openTransaction(requestEntity);
                 } else if ("_close".equalsIgnoreCase(postUrl[1])){
                     requestEntity=getCloseTransaction(actionEntity);
+                    System.out.println("closeTransaction------------");
 //                    closeTransaction(requestEntity);
                 } else {
                     System.out.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
                 }
                 break;
-            case 3:
-                if ("_insert".equalsIgnoreCase(postUrl[2])){
+            case 4:
+                if ("_insert".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getPutCells(actionEntity);
+                    System.out.println("putCells-------------");
 //                    putCells(requestEntity);
-                }else if ("alter".equalsIgnoreCase(postUrl[2])){
+                }else if ("alter".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getAlterTable(actionEntity);
+                    System.out.println("alterTable-------------");
 //                    alterTable(requestEntity);
-                }else if ("_merge".equalsIgnoreCase(postUrl[2])){
+                }else if ("_merge".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getMergeVersion(actionEntity);
+                    System.out.println("mergeVersion---------------");
 //                    mergeVersion(requestEntity);
-                }else if ("_use".equalsIgnoreCase(postUrl[2])){
+                }else if ("_use".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getUseVersion(actionEntity);
+                    System.out.println("useVersion-----------");
 //                    useVersion(requestEntity);
-                }else if ("_showVersion".equalsIgnoreCase(postUrl[2])){
+                }else if ("_showVersion".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getShowVersion(actionEntity);
+                    System.out.println("showVersion--------------");
 //                    showVersion(requestEntity);
-                }else if ("_search".equalsIgnoreCase(postUrl[2])){
+                }else if ("_search".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getSingleSearch(actionEntity);
+                    System.out.println("singleSearch-------------");
 //                    singleSearch(requestEntity);
-                }else if ("_delete".equalsIgnoreCase(postUrl[2])){
+                }else if ("_delete".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getDeleteCells(actionEntity);
+                    System.out.println("deleteCells-------------------");
 //                    deleteCells(requestEntity);
-                }else if ("_update".equalsIgnoreCase(postUrl[2])){
+                }else if ("_update".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getUpdateCells(actionEntity);
+                    System.out.println("updateCells---------------");
 //                    updateCells(requestEntity);
-                }else if ("_mget".equalsIgnoreCase(postUrl[2])){
+                }else if ("_mget".equalsIgnoreCase(postUrl[3])){
                     requestEntity=getMultiSearch(actionEntity);
+                    System.out.println("multiSearch----------------");
 //                    multiSearch(requestEntity);
                 } else {
                     System.err.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
                 }
+                break;
 //                switch (postUrl[2]){
 //                    case "_insert":
 //                    case "alter":
@@ -361,7 +378,6 @@ public class EX {
 //                }
             default:
                 System.err.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
-
         }
     }
     public static <T> List<T> castList(Object obj, Class<T> clazz)
@@ -389,19 +405,20 @@ public class EX {
     }
     private static RequestEntity getMultiSearch(ActionEntity actionEntity) {
         MultiSearch multiSearch=new MultiSearch();
-        multiSearch.setUri(actionEntity.getUrl());
-        multiSearch.setMethod("POST");
-        if (actionEntity.getRegularAttribute().isEmpty()){
+        setBaseAttribute(multiSearch,actionEntity);
+        if (actionEntity.getRegularAttribute()==null){
             System.err.println("把actionEntity.getRegularAttribute打印出来并且说明");
         }
-        for (Map.Entry<String,Object> cfs:actionEntity.getRegularAttribute().entrySet()){
-            if ("cf_names".equalsIgnoreCase(cfs.getKey())){
-               List<String> cf_names=castList(cfs.getValue(),String.class);
+        for (Map.Entry<String,Object> cell:actionEntity.getRegularAttribute().entrySet()){
+            if ("cf_names".equalsIgnoreCase(cell.getKey())){
+               List<String> cf_names=castList(cell.getValue(),String.class);
                if (cf_names.size()==0){
                    System.err.println("报错提示cf_names为空");
                }
                multiSearch.setCf_names(cf_names);
-            }else {
+            }else if ("limit".equalsIgnoreCase(cell.getKey())) {
+                multiSearch.setLimit(Integer.parseInt((String) cell.getValue()));
+            }else{
                 System.err.println("出现未知属性，打印key");
             }
         }
