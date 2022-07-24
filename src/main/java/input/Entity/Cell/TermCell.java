@@ -21,7 +21,7 @@ public class TermCell {
     private String c_name;
     private long size=0;
     private double max=Double.MAX_VALUE;
-    private boolean equivalence=false;
+    private Integer equivalence;
     private double min=Double.MIN_VALUE;
     private String like;
 
@@ -41,7 +41,7 @@ public class TermCell {
         return max;
     }
 
-    public boolean getEquivalence() {
+    public Integer getEquivalence() {
         return equivalence;
     }
 
@@ -69,7 +69,7 @@ public class TermCell {
         this.max = max;
     }
 
-    public void setEquivalence(boolean equivalence) {
+    public void setEquivalence(int equivalence) {
         this.equivalence = equivalence;
     }
 

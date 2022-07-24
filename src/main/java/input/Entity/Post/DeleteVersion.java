@@ -6,6 +6,13 @@ package input.Entity.Post;
  */
 public class DeleteVersion extends RequestEntity {
     private String rowKey;
-    private String version;
+    private int version;
 
+    public void setRowKey(String rowKey) {
+        this.rowKey = rowKey;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
 }

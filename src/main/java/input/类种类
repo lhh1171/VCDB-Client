@@ -127,8 +127,8 @@ post http://ip:端口/dbname/tab_name/_search
 	"Aggregate(聚合)":
 	    [
             {
-            "Aggregate_name":avg/min/max/sum,(必要)
-            column:"StudentAge",(必要)
+            "function":avg/min/max/sum,(必要)
+            c_name:"StudentAge",(必要)
             as:“xxx”(必要)
             },
         .....

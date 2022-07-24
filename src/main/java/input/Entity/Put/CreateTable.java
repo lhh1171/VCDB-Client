@@ -3,7 +3,7 @@ package input.Entity.Put;
 
 
 
-import input.Entity.Delete.ColumnFamilyCell;
+import input.Entity.Cell.ColumnFamilyCell;
 import input.Entity.Post.RequestEntity;
 
 import java.util.List;

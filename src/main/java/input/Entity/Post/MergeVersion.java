@@ -1,6 +1,7 @@
 package input.Entity.Post;
 
 import input.Entity.Cell.TermCell;
+import input.Entity.Cell.VersionTerm;
 
 import java.util.List;
 
@@ -10,13 +11,14 @@ import java.util.List;
  */
 public class MergeVersion extends RequestEntity {
     private String rowKey;
-    private List<TermCell> terms;
+    private List<VersionTerm> terms;
+
+    public void setTerms(List<VersionTerm> terms) {
+        this.terms = terms;
+    }
 
     public void setRowKey(String rowKey) {
         this.rowKey = rowKey;
     }
 
-    public void setTerms(List<TermCell> terms) {
-        this.terms = terms;
-    }
 }

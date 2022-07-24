@@ -47,7 +47,7 @@ public class ActionEntity {
             map.put(key,list);
             setCompoundAttribute(map);
         }else {
-            this.RegularAttribute.put(key,list);
+            this.CompoundAttribute.put(key,list);
         }
     }
     public void setRegularAttribute(HashMap<String, Object> regularAttribute) {

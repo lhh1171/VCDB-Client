@@ -43,6 +43,9 @@ public class JsonToRestFulEntityHandler extends ChannelInboundHandlerAdapter {
     }
     //解析json转换为实体
     public  ActionEntity jsonToJavaOfRestfulEntity(String content,ActionEntity actionEntity) throws JSONException {
+        if ("".equals(content)){
+            return  actionEntity;
+        }
         JSONObject jsonObject = new JSONObject(content.trim());
         Iterator keys = jsonObject.keys();
         while(keys.hasNext()) {
@@ -88,7 +91,7 @@ public class JsonToRestFulEntityHandler extends ChannelInboundHandlerAdapter {
                 }
             }
             actionEntity.addRegularAttribute(key,cfNames);
-        }else {
+        } else {
             List<HashMap<String, String>> hashMapList=new ArrayList<HashMap<String, String>>();
             for(int i=0;i<array.length();i++) {
                 String key2;

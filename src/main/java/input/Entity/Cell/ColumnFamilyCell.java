@@ -1,4 +1,4 @@
-package input.Entity.Delete;
+package input.Entity.Cell;
 
 
 /**
@@ -8,10 +8,10 @@ package input.Entity.Delete;
 public class ColumnFamilyCell{
     private String cf_name;
     private String type;
-    private double min;
-    private double max;
-    private boolean unique;
-    private boolean isNull;
+    private double min=Double.MIN_VALUE;
+    private double max=Double.MAX_VALUE;
+    private Boolean unique;
+    private Boolean isNull;
     private int Version=Integer.MAX_VALUE;
     private String method;
 
@@ -31,11 +31,11 @@ public class ColumnFamilyCell{
         return max;
     }
 
-    public boolean isUnique() {
+    public Boolean isUnique() {
         return unique;
     }
 
-    public boolean isNull() {
+    public Boolean isNull() {
         return isNull;
     }
 
