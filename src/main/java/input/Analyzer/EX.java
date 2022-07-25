@@ -1,13 +1,13 @@
 package input.Analyzer;
 
-import input.Entity.Cell.*;
-import input.Entity.Cell.ColumnFamilyCell;
-import input.Entity.Delete.DeleteCells;
-import input.Entity.Delete.DeleteDB;
-import input.Entity.Delete.DeleteTable;
-import input.Entity.Post.*;
-import input.Entity.Put.CreateDB;
-import input.Entity.Put.CreateTable;
+import input.entity.Cell.*;
+import input.entity.Cell.ColumnFamilyCell;
+import input.entity.Delete.DeleteCells;
+import input.entity.Delete.DeleteDB;
+import input.entity.Delete.DeleteTable;
+import input.entity.Post.*;
+import input.entity.Put.CreateDB;
+import input.entity.Put.CreateTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,110 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EX {
-    public static int MethodState = 0; // method
-    public static int PutState = 0;
-    public static int DeleteState = 0;
-    public static int PostState = 0;
-    public static RequestEntity requestEntity;
-
-    //    public static void DFA(ActionEntity actionEntity){
-//        if (isPut(actionEntity)) {
-//            MethodState = 1;
-//        } else if (isDelete(actionEntity)) {
-//            MethodState = 2;
-//        } else if (isPost(actionEntity)) {
-//            MethodState = 3;
-//        } else {
-//            MethodGetErr(actionEntity);
-//        }
-//        switch (MethodState){
-//            case 1:
-//                if (isCreateDB(actionEntity)) {
-//                    PutState=1;
-//                    requestEntity=getCreateDB();
-//                    createDB(requestEntity);
-//                    break;
-//                } else if (isCreateTable(actionEntity)) {
-//                    PutState=2;
-//                    requestEntity=getCreateTable();
-//                    createTable(requestEntity);
-//                    break;
-//                } else if (isPutCells(actionEntity)) {
-//                    PutState=3;
-//                    requestEntity=getPutCells();
-//                    putCells(requestEntity);
-//                    break;
-//                } else {
-//                    putErr(actionEntity);
-//                    break;
-//                }
-//            case 2:
-//                if (isDeleteDB(actionEntity)) {
-//                    DeleteState=1;
-//                    requestEntity=getDeleteDB();
-//                    deleteDB(requestEntity);
-//                    break;
-//                } else if (isDeleteTable(actionEntity)) {
-//                    DeleteState=2;
-//                    requestEntity=getDeleteTable();
-//                    deleteTable(requestEntity);
-//                    break;
-//                } else {
-//                    deleteErr(actionEntity);
-//                    break;
-//                }
-//                break;
-//            case 3:
-//                if(isAlterTable()){
-//                    requestEntity=getAlterTable(actionEntity);
-//                    alterTable(requestEntity);
-//                    break;
-//                }else if(isOpenTransaction()){
-//                    requestEntity=getOpenTransaction(actionEntity);
-//                    openTransaction(requestEntity);
-//                    break;
-//                }else if(isCloseTransaction()){
-//                    requestEntity=getCloseTransaction(actionEntity);
-//                    closeTransaction(requestEntity);
-//                }else if(isMergeVersion()){
-//                    requestEntity=getMergeVersion(actionEntity);
-//                    mergeVersion(requestEntity);
-//                    break;
-//                }else if(isUseVersion()){
-//                    requestEntity=getUseVersion(actionEntity);
-//                    useVersion(requestEntity);
-//                    break;
-//                }else if(isShowVersion()){
-//                    requestEntity=getShowVersion(actionEntity);
-//                    showVersion(requestEntity);
-//                    break;
-//                }else if(isSingleSearch()){
-//                    requestEntity=getSingleSearch(actionEntity);
-//                    singleSearch(requestEntity);
-//                    break;
-//                }else if(isDeleteCells()){
-//                    requestEntity=getDeleteCells(actionEntity);
-//                    deleteCells(requestEntity);
-//                    break;
-//                }else if(isUpdateCells()){
-//                    requestEntity=getUpdateCells(actionEntity);
-//                    updateCells(requestEntity);
-//                    break;
-//                }else if(isMultiSearch()){
-//                    requestEntity=getMultiSearch(actionEntity);
-//                    multiSearch(requestEntity);
-//                    break;
-//                }else if(isDeleteVersion()){
-//                    requestEntity=getDeleteVersion(actionEntity);
-//                    deleteVersion(requestEntity);
-//                    break;
-//                }
-//                break;
-//            default:
-//                System.out.println("未知错误---------------------");
-//        }
-//    }
     public static void DFA2(ActionEntity actionEntity) {
+        int MethodState = 0; // method
         //用枚举替换
         if (isPut(actionEntity)) {
             MethodState = 1;
@@ -150,6 +48,7 @@ public class EX {
     }
 
     private static void handlePut(ActionEntity actionEntity) {
+        RequestEntity requestEntity;
         String[] putUrl = actionEntity.getUrl().split("/");
         switch (putUrl.length) {
             case 2:
@@ -219,13 +118,13 @@ public class EX {
                         System.err.println("报错重复设置max属性");
                     }
                 } else if ("isNull".equalsIgnoreCase(cell.getKey())) {
-                    if (columnFamilyCell.isNull()==null) {
+                    if (columnFamilyCell.isNull() == null) {
                         columnFamilyCell.setNull(Boolean.parseBoolean(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置isNull属性");
                     }
                 } else if ("unique".equalsIgnoreCase(cell.getKey())) {
-                    if (columnFamilyCell.isUnique()==null) {
+                    if (columnFamilyCell.isUnique() == null) {
                         columnFamilyCell.setUnique(Boolean.parseBoolean(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置unique属性");
@@ -270,6 +169,7 @@ public class EX {
 
 
     private static void handleDelete(ActionEntity actionEntity) {
+        RequestEntity requestEntity;
         String[] deleteUrl = actionEntity.getUrl().split("/");
         switch (deleteUrl.length) {
             case 2:
@@ -313,6 +213,7 @@ public class EX {
     }
 
     private static void handlePost(ActionEntity actionEntity) {
+        RequestEntity requestEntity;
         String[] postUrl = actionEntity.getUrl().split("/");
         switch (postUrl.length) {
             case 2:
@@ -357,7 +258,7 @@ public class EX {
                     requestEntity = getDeleteCells(actionEntity);
                     System.out.println("deleteCells-------------------");
 //                    deleteCells(requestEntity);
-                }else if ("delete_version".equalsIgnoreCase(postUrl[3])) {
+                } else if ("delete_version".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getDeleteVersion(actionEntity);
                     System.out.println("multiSearch----------------");
 //                    multiSearch(requestEntity);
@@ -373,19 +274,6 @@ public class EX {
                     System.err.println("the URL Segment is error" + "给出提示（把POST开头的所有的命令返还给他");
                 }
                 break;
-//                switch (postUrl[2]){
-//                    case "_insert":
-//                    case "alter":
-//                    case "_merge":
-//                    case "_use":
-//                    case "_showVersion":
-//                    case "_search":
-//                    case "_delete":
-//                    case "_update":
-//                    case "_mget":
-//                    default:
-//                        System.out.println("the URL Segment is error"+"给出提示（把POST开头的所有的命令返还给他");
-//                }
             default:
                 System.err.println("the URL Segment is error" + "给出提示（把POST开头的所有的命令返还给他");
                 break;
@@ -393,12 +281,12 @@ public class EX {
     }
 
     private static RequestEntity getDeleteVersion(ActionEntity actionEntity) {
-        DeleteVersion deleteVersion=new DeleteVersion();
+        DeleteVersion deleteVersion = new DeleteVersion();
         setBaseAttribute(deleteVersion, actionEntity);
         for (Map.Entry<String, Object> cfs : actionEntity.getRegularAttribute().entrySet()) {
             if ("rowKey".equalsIgnoreCase(cfs.getKey())) {
                 deleteVersion.setRowKey((String) cfs.getValue());
-            }else if ("version".equalsIgnoreCase(cfs.getKey())) {
+            } else if ("version".equalsIgnoreCase(cfs.getKey())) {
                 deleteVersion.setVersion((Integer.parseInt((String) cfs.getValue())));
             } else {
                 System.err.println("出现未知属性，打印key");
@@ -607,7 +495,7 @@ public class EX {
                         System.err.println("报错重复设置max属性");
                     }
                 } else if ("equivalence".equalsIgnoreCase(cell.getKey())) {
-                    if (termCell.getEquivalence()==null) {
+                    if (termCell.getEquivalence() == null) {
                         termCell.setEquivalence(Integer.parseInt(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置equivalence属性");
@@ -675,9 +563,9 @@ public class EX {
                     System.err.println("报错提示cf_names为空");
                 }
                 singleSearch.setCf_names(cf_names);
-            }else if ("limit".equalsIgnoreCase(cfs.getKey())) {
+            } else if ("limit".equalsIgnoreCase(cfs.getKey())) {
                 singleSearch.setLimit(Integer.parseInt((String) cfs.getValue()));
-            }  else {
+            } else {
                 System.err.println("出现未知属性，打印key");
             }
         }
@@ -754,7 +642,7 @@ public class EX {
         for (Map.Entry<String, Object> cfs : actionEntity.getRegularAttribute().entrySet()) {
             if ("rowKey".equalsIgnoreCase(cfs.getKey())) {
                 useVersion.setRowKey((String) cfs.getValue());
-            }else if ("version".equalsIgnoreCase(cfs.getKey())) {
+            } else if ("version".equalsIgnoreCase(cfs.getKey())) {
                 useVersion.setVersion((Integer.parseInt((String) cfs.getValue())));
             } else {
                 System.err.println("出现未知属性，打印key");
@@ -793,13 +681,13 @@ public class EX {
                     } else {
                         System.err.println("报错重复设置rowKey属性");
                     }
-                }  else if ("version-from".equalsIgnoreCase(cell.getKey())) {
+                } else if ("version-from".equalsIgnoreCase(cell.getKey())) {
                     if (termCell.getVersionFrom() == -1) {
                         termCell.setVersionFrom(Integer.parseInt(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置version-from属性");
                     }
-                }else if ("version-to".equalsIgnoreCase(cell.getKey())) {
+                } else if ("version-to".equalsIgnoreCase(cell.getKey())) {
                     if (termCell.getVersionTo() == -1) {
                         termCell.setVersionTo(Integer.parseInt(cell.getValue()));
                     } else {
@@ -810,7 +698,7 @@ public class EX {
                 }
             }
             //TODO检查termCell必要属性是否为空
-            if (!isNull(termCell.getRowKey(),termCell.getVersionFrom(),termCell.getVersionTo())) {
+            if (!isNull(termCell.getRowKey(), termCell.getVersionFrom(), termCell.getVersionTo())) {
                 terms.add(termCell);
             } else {
                 System.err.println("term缺少必要属性");
@@ -867,19 +755,19 @@ public class EX {
             if ("put".equalsIgnoreCase(alterCell.getMethod())) {
                 if (!isNull(alterCell.getCfName()) && isNull(alterCell.getOld_cfName())) {
                     alterCells.add(alterCell);
-                }else {
+                } else {
                     System.err.println("aggregate缺少必要属性");
                 }
             } else if ("delete".equalsIgnoreCase(alterCell.getMethod())) {
                 if (isNull(alterCell.getCfName()) && !isNull(alterCell.getOld_cfName())) {
                     alterCells.add(alterCell);
-                }else {
+                } else {
                     System.err.println("aggregate缺少必要属性");
                 }
             } else if ("update".equalsIgnoreCase(alterCell.getMethod())) {
                 if (!isNull(alterCell.getCfName()) && !isNull(alterCell.getOld_cfName())) {
                     alterCells.add(alterCell);
-                }else {
+                } else {
                     System.err.println("aggregate缺少必要属性");
                 }
             } else {
@@ -948,9 +836,4 @@ public class EX {
     private static boolean isPut(ActionEntity actionEntity) {
         return "PUT".equalsIgnoreCase(actionEntity.getMethod());
     }
-
-//    public static void main(String[] args) {
-//        ActionEntity actionEntity=new ActionEntity();
-//        String[] split = actionEntity.getMethod().split("/");
-//    }
 }
