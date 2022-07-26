@@ -8,6 +8,7 @@ import input.entity.Delete.DeleteTable;
 import input.entity.Post.*;
 import input.entity.Put.CreateDB;
 import input.entity.Put.CreateTable;
+import input.executor.VCDBAdmin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 public class EX {
+    public  static VCDBAdmin vcdbAdmin;
+    static {
+        //        initAdmin();
+    }
     public static void DFA2(ActionEntity actionEntity) {
         int MethodState = 0; // method
         //用枚举替换
@@ -54,12 +59,13 @@ public class EX {
             case 2:
                 requestEntity = getCreateDB(actionEntity);
                 System.out.println("createDB----------");
-//                createDB(requestEntity);
+                //Before using the VCdbAdmin object, check whether it is initialized
+                vcdbAdmin.createDB((CreateDB) requestEntity);
                 break;
             case 3:
                 requestEntity = getCreateTable(actionEntity);
                 System.out.println("createTable---------");
-//                createTable(requestEntity);
+                vcdbAdmin.createTable((CreateTable) requestEntity);
                 break;
             default:
                 System.out.println("the URL Segment is error" + "给出提示（把PUT所有的命令返还给他");
@@ -174,14 +180,15 @@ public class EX {
         switch (deleteUrl.length) {
             case 2:
                 requestEntity = getDeleteDB(actionEntity);
+                //项任务池里投放任务
 //                putCell(Node);
                 System.out.println("deleteDB------------");
-//                deleteDB(requestEntity);
+                vcdbAdmin.deleteDB((DeleteCells) requestEntity);
                 break;
             case 3:
                 requestEntity = getDeleteTable(actionEntity);
                 System.out.println("deleteTable----------------");
-//                deleteTable(requestEntity);
+                vcdbAdmin.deleteTable((DeleteTable) requestEntity);
                 break;
             default:
                 System.out.println("the URL Segment is error" + "给出提示（把Delete开头的所有的命令返还给他");
@@ -220,11 +227,11 @@ public class EX {
                 if ("_open".equalsIgnoreCase(postUrl[1])) {
                     requestEntity = getOpenTransaction(actionEntity);
                     System.out.println("openTransaction---------------");
-//                    openTransaction(requestEntity);
+                    vcdbAdmin.openTransaction((OpenTransaction) requestEntity);
                 } else if ("_close".equalsIgnoreCase(postUrl[1])) {
                     requestEntity = getCloseTransaction(actionEntity);
                     System.out.println("closeTransaction------------");
-//                    closeTransaction(requestEntity);
+                    vcdbAdmin.closeTransaction((CloseTransaction) requestEntity);
                 } else {
                     System.out.println("the URL Segment is error" + "给出提示（把POST开头的所有的命令返还给他");
                 }
@@ -233,43 +240,43 @@ public class EX {
                 if ("_insert".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getPutCells(actionEntity);
                     System.out.println("putCells-------------");
-//                    putCells(requestEntity);
+                    vcdbAdmin.putCells((PutCells) requestEntity);
                 } else if ("_alter".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getAlterTable(actionEntity);
                     System.out.println("alterTable-------------");
-//                    alterTable(requestEntity);
+                    vcdbAdmin.alterTable((AlterTable) requestEntity);
                 } else if ("_merge".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getMergeVersion(actionEntity);
                     System.out.println("mergeVersion---------------");
-//                    mergeVersion(requestEntity);
+                    vcdbAdmin.mergeVersion((MergeVersion) requestEntity);
                 } else if ("_use".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getUseVersion(actionEntity);
                     System.out.println("useVersion-----------");
-//                    useVersion(requestEntity);
+                    vcdbAdmin.useVersion((UseVersion) requestEntity);
                 } else if ("_showVersion".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getShowVersion(actionEntity);
                     System.out.println("showVersion--------------");
-//                    showVersion(requestEntity);
+                    vcdbAdmin.showVersion((ShowVersion) requestEntity);
                 } else if ("_search".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getSingleSearch(actionEntity);
                     System.out.println("singleSearch-------------");
-//                    singleSearch(requestEntity);
+                    vcdbAdmin.singleSearch((SingleSearch) requestEntity);
                 } else if ("_delete".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getDeleteCells(actionEntity);
                     System.out.println("deleteCells-------------------");
-//                    deleteCells(requestEntity);
+                    vcdbAdmin.deleteCells((DeleteCells) requestEntity);
                 } else if ("delete_version".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getDeleteVersion(actionEntity);
-                    System.out.println("multiSearch----------------");
-//                    multiSearch(requestEntity);
+                    System.out.println("deleteVersion----------------");
+                    vcdbAdmin.deleteVersion((DeleteVersion) requestEntity);
                 } else if ("_update".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getUpdateCells(actionEntity);
                     System.out.println("updateCells---------------");
-//                    updateCells(requestEntity);
+                    vcdbAdmin.updateCells((UpdateCells) requestEntity);
                 } else if ("_mget".equalsIgnoreCase(postUrl[3])) {
                     requestEntity = getMultiSearch(actionEntity);
                     System.out.println("multiSearch----------------");
-//                    multiSearch(requestEntity);
+                    vcdbAdmin.multiSearch((MultiSearch) requestEntity);
                 } else {
                     System.err.println("the URL Segment is error" + "给出提示（把POST开头的所有的命令返还给他");
                 }
