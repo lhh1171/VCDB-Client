@@ -1,7 +1,5 @@
 package input.store.mem;
 
-import java.util.Comparator;
-
 public class KeyValue {
     String rowKey;
     ValueNode valueListHead;
@@ -22,9 +20,15 @@ public class KeyValue {
         }
     }
 
-    public class KVComparator implements Comparator {
+    public static class KVComparator implements RawComparator<ValueNode> {
+
         @Override
-        public int compare(Object o1, Object o2) {
+        public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+            return 0;
+        }
+
+        @Override
+        public int compare(ValueNode o1, ValueNode o2) {
             return 0;
         }
     }
