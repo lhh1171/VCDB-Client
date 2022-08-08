@@ -18,13 +18,9 @@
  */
 
 package input.store.bloom;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 public final class BloomFilterFactory {
-
-  private static final Log LOG =
-      LogFactory.getLog(BloomFilterFactory.class.getName());
 
   /** This class should not be instantiated. */
   private BloomFilterFactory() {}
