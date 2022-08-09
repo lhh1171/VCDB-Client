@@ -11,8 +11,6 @@ import java.nio.channels.WritableByteChannel;
 
 
 public class IOUtils {
-
-
   public static void copyBytes(InputStream in, OutputStream out, int buffSize, boolean close) 
     throws IOException {
     try {
@@ -45,8 +43,6 @@ public class IOUtils {
       bytesRead = in.read(buf);
     }
   }
-
-
 
 
   /**

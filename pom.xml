@@ -30,6 +30,13 @@
             <artifactId>fastjson</artifactId>
             <version>1.1-unwrap</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+            <version>0.0.20131108.vaadin1</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -70,5 +77,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
+
     </dependencies>
 </project>

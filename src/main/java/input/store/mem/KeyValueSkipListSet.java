@@ -27,96 +27,96 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 
-public class KeyValueSkipListSet implements NavigableSet<KeyValue> {
-  private final ConcurrentNavigableMap<KeyValue, KeyValue> delegatee;
+public class KeyValueSkipListSet implements NavigableSet<KV> {
+  private final ConcurrentNavigableMap<KV, KV> delegatee;
 
-  KeyValueSkipListSet(final KeyValue.KVComparator c) {
-    this.delegatee = new ConcurrentSkipListMap<KeyValue, KeyValue>(c);
+  KeyValueSkipListSet(final KV.KVComparator c) {
+    this.delegatee = new ConcurrentSkipListMap(c);
   }
 
-  KeyValueSkipListSet(final ConcurrentNavigableMap<KeyValue, KeyValue> m) {
+  KeyValueSkipListSet(final ConcurrentNavigableMap<KV, KV> m) {
     this.delegatee = m;
   }
 
-  public KeyValue ceiling(KeyValue e) {
+  public KV ceiling(KV e) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public Iterator<KeyValue> descendingIterator() {
+  public Iterator<KV> descendingIterator() {
     return this.delegatee.descendingMap().values().iterator();
   }
 
-  public NavigableSet<KeyValue> descendingSet() {
+  public NavigableSet<KV> descendingSet() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public KeyValue floor(KeyValue e) {
+  public KV floor(KV e) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public SortedSet<KeyValue> headSet(final KeyValue toElement) {
+  public SortedSet<KV> headSet(final KV toElement) {
     return headSet(toElement, false);
   }
 
-  public NavigableSet<KeyValue> headSet(final KeyValue toElement,
+  public NavigableSet<KV> headSet(final KV toElement,
       boolean inclusive) {
     return new KeyValueSkipListSet(this.delegatee.headMap(toElement, inclusive));
   }
 
-  public KeyValue higher(KeyValue e) {
+  public KV higher(KV e) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public Iterator<KeyValue> iterator() {
+  public Iterator<KV> iterator() {
     return this.delegatee.values().iterator();
   }
 
-  public KeyValue lower(KeyValue e) {
+  public KV lower(KV e) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public KeyValue pollFirst() {
+  public KV pollFirst() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public KeyValue pollLast() {
+  public KV pollLast() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public SortedSet<KeyValue> subSet(KeyValue fromElement, KeyValue toElement) {
+  public SortedSet<KV> subSet(KV fromElement, KV toElement) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public NavigableSet<KeyValue> subSet(KeyValue fromElement,
-      boolean fromInclusive, KeyValue toElement, boolean toInclusive) {
+  public NavigableSet<KV> subSet(KV fromElement,
+      boolean fromInclusive, KV toElement, boolean toInclusive) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public SortedSet<KeyValue> tailSet(KeyValue fromElement) {
+  public SortedSet<KV> tailSet(KV fromElement) {
     return tailSet(fromElement, true);
   }
 
-  public NavigableSet<KeyValue> tailSet(KeyValue fromElement, boolean inclusive) {
+  public NavigableSet<KV> tailSet(KV fromElement, boolean inclusive) {
     return new KeyValueSkipListSet(this.delegatee.tailMap(fromElement, inclusive));
   }
 
-  public Comparator<? super KeyValue> comparator() {
+  public Comparator<? super KV> comparator() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public KeyValue first() {
+  public KV first() {
     return this.delegatee.get(this.delegatee.firstKey());
   }
 
-  public KeyValue last() {
+  public KV last() {
     return this.delegatee.get(this.delegatee.lastKey());
   }
 
-  public boolean add(KeyValue e) {
+  public boolean add(KV e) {
     return this.delegatee.put(e, e) == null;
   }
 
-  public boolean addAll(Collection<? extends KeyValue> c) {
+  public boolean addAll(Collection<? extends KV> c) {
     throw new UnsupportedOperationException("Not implemented");
   }
 
@@ -149,7 +149,7 @@ public class KeyValueSkipListSet implements NavigableSet<KeyValue> {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public KeyValue get(KeyValue kv) {
+  public KV get(KV kv) {
     return this.delegatee.get(kv);
   }
 

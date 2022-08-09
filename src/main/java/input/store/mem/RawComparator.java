@@ -35,5 +35,4 @@ public interface RawComparator<T> extends Comparator<T> {
    * @return An integer result of the comparison.
    */
   public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2);
-
 }

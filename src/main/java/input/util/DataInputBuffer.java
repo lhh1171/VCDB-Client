@@ -5,7 +5,6 @@ package input.util;
 import java.io.*;
 
 
-
 public class DataInputBuffer extends DataInputStream {
   private static class Buffer extends ByteArrayInputStream {
     public Buffer() {

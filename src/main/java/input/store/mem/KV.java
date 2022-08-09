@@ -6,17 +6,54 @@ import java.util.List;
 
 public class KV {
     private byte[] data = null;  // an immutable byte array that contains the KV
-    private int offset = 0;  // offset into bytes buffer KV starts at
     private int length = 0;  // length of the KV starting from offset.
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public String getRowKey() {
+        return null;
+    }
+
+    public String getQualifier() {
+        return null;
+    }
+
+    public String getTime() {
+        return null;
+    }
+
+    public byte getType() {
+        return 0;
+    }
+
+    public String getValue() {
+        return null;
+    }
 
     public KV(final byte[] row, final int rOffset, final int rLength,
               final byte[] family, final int fOffset, final int fLength,
-              final byte[] qualifier, final int qOffset, final int qLength,
               final List<ValueNode> values) {
         this.data = createByteArray(row, rOffset, rLength,
                 family, fOffset, fLength, values);
-        this.length = data.length;
-        this.offset = 0;
+        this.length = this.data.length;
+    }
+
+    public KV() {
+
     }
 
     //row is rowKey
@@ -30,7 +67,7 @@ public class KV {
         if (values != null && !values.isEmpty()) {
             for (ValueNode v : values) {
                 //valueLengthSize+length
-                valuesLength += v.getLength()+8;
+                valuesLength += v.getLength() + 8;
             }
         }
         int keyLength = (int) getKeyDataStructureSize(rLength, fLength);
@@ -38,7 +75,7 @@ public class KV {
         // Write key, value and key row length.
         int pos = 0;
         pos = Bytes.putInt(bytes, pos, keyLength);
-        pos = Bytes.putShort(bytes, pos, (short)(rLength & 0x0000ffff));
+        pos = Bytes.putShort(bytes, pos, (short) (rLength & 0x0000ffff));
         pos = Bytes.putBytes(bytes, pos, row, rOffset, rLength);
         pos = Bytes.putByte(bytes, pos, (byte) (fLength & 0x0000ff));
         if (fLength != 0) {
@@ -63,22 +100,24 @@ public class KV {
         return getKeyDataStructureSize(rLength, fLength) + valuesLength;
     }
 
-    public KV() {
-
-    }
-
-
     public static enum Type {
-        Minimum((byte) 0),
-        Put((byte) 4),
+        CreateDB((byte) 0),
+        createTable((byte) 4),
+        DeleteDB((byte) 8),
+        DeleteTable((byte) 10),
+        OpenTransaction((byte) 12),
+        CloseTransaction((byte) 14),
+        PutCells((byte) 16),
+        AlterTable((byte) 18),
+        MergeVersion((byte) 20),
+        UseVersion((byte) 22),
+        ShowVersion((byte) 24),
+        SingleSearch((byte) 26),
+        DeleteCells((byte) 28),
+        UpdateCells((byte) 30),
+        MultiSearch((byte) 32),
+        DeleteVersion((byte) 34);
 
-        Delete((byte) 8),
-        DeleteFamilyVersion((byte) 10),
-        DeleteColumn((byte) 12),
-        DeleteFamily((byte) 14),
-
-        // Maximum is used when searching; you look from maximum on down.
-        Maximum((byte) 255);
 
         private final byte code;
 
@@ -86,46 +125,10 @@ public class KV {
             this.code = c;
         }
 
-
         public byte getCode() {
             return this.code;
         }
 
-        /**
-         * Cannot rely on enum ordinals . They change if item is removed or moved.
-         * Do our own codes.
-         *
-         * @param b
-         * @return Type associated with passed code.
-         */
-        public static Type codeToType(final byte b) {
-            for (Type t : Type.values()) {
-                if (t.getCode() == b) {
-                    return t;
-                }
-            }
-            throw new RuntimeException("Unknown code " + b);
-        }
-    }
-
-    public String getRowKey() {
-        return null;
-    }
-
-    public String getQualifier() {
-        return null;
-    }
-
-    public String getTime() {
-        return null;
-    }
-
-    public byte getType() {
-        return 0;
-    }
-
-    public String getValue() {
-        return null;
     }
 
     private static void checkParameters(final byte[] row, final int rlength,
@@ -148,7 +151,7 @@ public class KV {
         //length=lengthSize+length
         private int length = 0;
         private int offset = 0;
-        private byte[] bytes = null;  // an immutable byte array that contains the KV
+        private final byte[] bytes;  // an immutable byte array that contains the KV
 
         //qualifier,timestamp,actionType,value
         public ValueNode(final long timestamp, final Type type,
@@ -160,8 +163,20 @@ public class KV {
         private byte[] createByteArray(long timestamp, Type type,
                                        byte[] qualifier, int qOffset, int qLength,
                                        byte[] value, int vOffset, int vLength) {
-
-            return null;
+            //timestampSize+typeSize+qLengthSize+vLengthSize+qLength+vLength
+            this.length = 8 + 1 + 2 + 2 + qLength + vLength;
+            byte[] bytes = new byte[this.length];
+            int pos = 0;
+            pos = Bytes.putLong(bytes, pos, timestamp);
+            pos = Bytes.putByte(bytes, pos, type.getCode());
+            pos = Bytes.putInt(bytes, pos, qLength);
+            pos = Bytes.putBytes(bytes, pos, qualifier, qOffset, qLength);
+            pos = Bytes.putInt(bytes, pos, vLength);
+            if (vLength != 0) {
+                pos = Bytes.putBytes(bytes, pos, value, vOffset, vLength);
+            }
+            this.offset = pos;
+            return bytes;
         }
 
         int getLength() {
@@ -181,6 +196,7 @@ public class KV {
     public static class KVComparator implements RawComparator<ValueNode> {
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+
             return 0;
         }
 
@@ -190,4 +206,7 @@ public class KV {
         }
     }
 
+//    public static void main(String[] args) {
+//        System.out.println(Type.Delete.code);
+//    }
 }

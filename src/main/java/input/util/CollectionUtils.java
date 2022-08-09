@@ -14,7 +14,7 @@ import java.util.List;
 public class CollectionUtils {
 
   private static final List<Object> EMPTY_LIST = Collections.unmodifiableList(
-    new ArrayList<Object>(0));
+          new ArrayList<Object>(0));
 
   
   @SuppressWarnings("unchecked")

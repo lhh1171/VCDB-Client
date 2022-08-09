@@ -8,7 +8,6 @@ import java.util.List;
  * Utility methods for Iterable including null-safe handlers.
  */
 public class IterableUtils {
-
   private static final List<Object> EMPTY_LIST = Collections
       .unmodifiableList(new ArrayList<Object>(0));
 

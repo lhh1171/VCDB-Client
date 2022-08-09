@@ -1,39 +1,87 @@
 package input.store.mem;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 //对应的是一个表的一个版本的一个列族的数据
 public class MemStore {
-    String db_name;
-    String table_name;
-    int Version;
-    String cf_name;
-    /*用库名，表名，版本，列族来hash成的一个key*/
-    int memKey;
-    /*数据类型*/
-    short dataType;
-    SkipList skipList;
+    // Used to track when to flush
+    long timeOfOldestEdit = Long.MAX_VALUE;
+    AtomicLong size;
+    KeyValueSkipListSet kvset;
 
-    public MemStore(String db_name, String table_name, int version, String cf_name, short type) {
-        this.db_name = db_name;
-        this.table_name = table_name;
-        Version = version;
-        this.cf_name = cf_name;
-        this.dataType = type;
-        this.memKey=(db_name+table_name+version+cf_name).hashCode();
-        this.skipList = new SkipList();
+    // Snapshot of memstore.  Made for flusher.
+    volatile KeyValueSkipListSet snapshot;
+
+    long add(final KV kv) {
+        KV toAdd = maybeCloneWithAllocator(kv);
+        return internalAdd(toAdd);
     }
 
-    public void insertValue(String rowKey, long valueLength, String cname, String value,short opsType){
-        /*TODO
-        *  */
-        SkipList.SkipNode node = skipList.find(rowKey);
-        KeyValue valueListHead= node.data;
-        if (valueListHead==null){
-            skipList.insert(new KeyValue(rowKey,new ValueNode(cname,value,valueLength,opsType)));
-        }else{
-            valueListHead.insert(cname, value, valueLength,opsType);
+    private KV maybeCloneWithAllocator(KV kv) {
+        return null;
+    }
+
+    long timeOfOldestEdit() {
+        return timeOfOldestEdit;
+    }
+
+    private boolean addToKVSet(KV e) {
+        boolean b = this.kvset.add(e);
+        setOldestEditTimeToNow();
+        return b;
+    }
+
+    private boolean removeFromKVSet(KV e) {
+        boolean b = this.kvset.remove(e);
+        setOldestEditTimeToNow();
+        return b;
+    }
+
+    void setOldestEditTimeToNow() {
+        if (timeOfOldestEdit == Long.MAX_VALUE) {
+            timeOfOldestEdit = System.currentTimeMillis();
         }
     }
 
-    public MemStore() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Internal version of add() that doesn't clone KVs with the
+     * allocator, and doesn't take the lock.
+     * <p>
+     * Callers should ensure they already have the read lock taken
+     */
+    private long internalAdd(final KV toAdd) {
+        long s = heapSizeChange(toAdd, addToKVSet(toAdd));
+        this.size.addAndGet(s);
+        return s;
+    }
+    /*
+     * Calculate how the MemStore size has changed.  Includes overhead of the
+     * backing Map.
+     * @param kv
+     * @param notPresent True if the kv was NOT present in the set.
+     * @return Size
+     */
+    private long heapSizeChange(final KV kv, final boolean notPresent) {
+        return notPresent ? align(kv) : 0;
+    }
+    //将kv对齐,8的整数
+    private long align(KV kv) {
+        return 8;
     }
 }
