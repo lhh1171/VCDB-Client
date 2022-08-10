@@ -11,10 +11,13 @@ package input.store.region;
 public class VCRegion {
     /*
     * Trailer (offset of other member)
-    * FileInfo
-    * MetaIndex (每一个RegionMeta的物理地址)
-    * DataIndex (每一个KV的物理地址)
+    * RegionMeta (类）
+    * MetaIndex int(每一个RegionMeta的物理地址,按照Key的顺序排列)(大小固定)
+    * DataIndex int(每一个KV的物理地址)(大小固定，到达后需要分裂split)
+    *
     * MetaSet
-    * DataSet*/
+    * DataSet   (不分，一直往后累加，不用打乱排序）
+    * */
     private byte[] data = null;
+
 }
