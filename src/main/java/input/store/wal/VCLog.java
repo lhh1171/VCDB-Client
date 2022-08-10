@@ -1,4 +1,4 @@
-package input.store.file;
+package input.store.wal;
 
 import input.store.wal.WalEdit;
 
