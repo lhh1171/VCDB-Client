@@ -2,23 +2,23 @@ package input.store.wal;
 
 import input.forThread.HasThread;
 
-//AsyncNotifier
-//asyncWriter
-//asyncSyncers
+//AsyncNotifier异步通知结果
+//asyncWriter异步写入
+//asyncSyncers同步机器
 public class WalBuffer {
-    private class AsyncSyncer extends HasThread {
+    private static class AsyncSyncer extends HasThread {
         @Override
         public void run() {
 
         }
     }
-    private class AsyncWriter extends HasThread {
+    private static class AsyncWriter extends HasThread {
         @Override
         public void run() {
 
         }
     }
-    private class AsyncNotifier extends HasThread {
+    private static class AsyncNotifier extends HasThread {
 
         @Override
         public void run() {

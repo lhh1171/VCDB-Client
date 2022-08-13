@@ -1,13 +1,13 @@
 package input.store.region;
 
-//存储a region的具体信息(元数据)
+/**
+ * @ClassName RegionMeta
+ * @Description TODO
+ * @Author lqc
+ * @Date 2022/8/13 下午1:43
+ * @Version 1.0
+ */
+/*
+* PD提取的类，保存的是整个Region Server的元数据*/
 public class RegionMeta {
-    //该region对应的文件名
-    private String encodedName = null;
-    private byte [] endKey;
-    private byte [] startKey;
-    //Region 创建的时间戳
-    long timeStamp;
-    private boolean split = false;
-    private String tableName = null;
 }

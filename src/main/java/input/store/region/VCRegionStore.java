@@ -7,8 +7,8 @@ package input.store.region;
  * @Date 2022/8/9 下午10:25
  * @Version 1.0
  */
-
-public class VCRegion {
+/*Region的最小单位Store,一个store对应一个列族*/
+public class VCRegionStore {
     /*
     * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)
     * RegionMeta (类）
