@@ -8,7 +8,10 @@ package input.store.region;
  * @Version 1.0
  */
 /*Region的最小单位Store,一个store对应一个列族*/
-public class VCRegionStore {
+public class FileStore {
+    /*Trailer纪录了FileInfo、Data Index、Meta Index块的起始位置，Data Index和Meta Index索引的数量等。
+    * meta 主要存放meta信息，即BloomFilter信息。
+    * data 存储多个kv对*/
     /*
     * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)
     * RegionMeta (类）
