@@ -2,6 +2,8 @@ package input.store.mem;
 
 import input.util.Bytes;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class KV {
@@ -9,6 +11,9 @@ public class KV {
     private int length = 0;  // length of the KV starting from offset.
 
     public byte[] getData() {
+//        String s=new String("123456");
+//        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+
         return data;
     }
 
@@ -25,7 +30,20 @@ public class KV {
     }
 
     public String getRowKey() {
-        return null;
+        int keyLength=Bytes.toInt(this.data,0,4);
+        int rLength=Bytes.toInt(this.data,8,4);
+        String row=Bytes.toString(this.data,16,rLength);
+        int fLength=Bytes.toInt(this.data,16+rLength,4);
+        String family=Bytes.toString(this.data,20+rLength,fLength);
+        long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
+        byteToValues(this.data,28+rLength+fLength,valueLength);
+        return new String(this.data, StandardCharsets.UTF_8);
+    }
+
+    private List<ValueNode> byteToValues(byte[] data, int offset, long length) {
+        List<ValueNode> valueNodes=new ArrayList<ValueNode>();
+//        valueNodes.add();
+        return valueNodes;
     }
 
     public String getQualifier() {
@@ -75,9 +93,9 @@ public class KV {
         // Write key, value and key row length.
         int pos = 0;
         pos = Bytes.putInt(bytes, pos, keyLength);
-        pos = Bytes.putShort(bytes, pos, (short) (rLength & 0x0000ffff));
+        pos = Bytes.putInt(bytes, pos, rLength);
         pos = Bytes.putBytes(bytes, pos, row, rOffset, rLength);
-        pos = Bytes.putByte(bytes, pos, (byte) (fLength & 0x0000ff));
+        pos = Bytes.putInt(bytes, pos,fLength);
         if (fLength != 0) {
             pos = Bytes.putBytes(bytes, pos, family, fOffset, fLength);
         }
@@ -93,7 +111,7 @@ public class KV {
 
     private long getKeyDataStructureSize(int rLength, int fLength) {
         //ROWKey_LENGTH_SIZE + FAMILY_LENGTH_SIZE
-        return 2 + 1 + rLength + fLength;
+        return 4 + 4 + rLength + fLength;
     }
 
     private long getKeyValueDataStructureSize(int rLength, int fLength, int valuesLength) {

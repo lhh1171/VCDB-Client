@@ -9,5 +9,6 @@ package input.store.region;
  */
 /*
 * PD提取的类，保存的是整个Region Server的元数据*/
+    //单独存起来
 public class RegionMeta {
 }
