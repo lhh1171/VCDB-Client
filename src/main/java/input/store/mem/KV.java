@@ -36,12 +36,28 @@ public class KV {
         int fLength=Bytes.toInt(this.data,16+rLength,4);
         String family=Bytes.toString(this.data,20+rLength,fLength);
         long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
-        byteToValues(this.data,28+rLength+fLength,valueLength);
+        List<ValueNode> valueNodes = byteToValues(this.data, 28 + rLength + fLength, valueLength);
         return new String(this.data, StandardCharsets.UTF_8);
     }
 
     private List<ValueNode> byteToValues(byte[] data, int offset, long length) {
         List<ValueNode> valueNodes=new ArrayList<ValueNode>();
+        int pos=0;
+        int valueCount=Bytes.toInt(this.data,pos,4);
+        for (int i = 0; i < valueCount; i++) {
+            long timestamp=Bytes.toLong(this.data,pos,8);
+            pos=pos+8;
+            byte type=this.data[pos];
+            pos++;
+            int qLength=Bytes.toInt(this.data,pos,4);
+            pos=pos+4;
+            String qualifier=Bytes.toString(this.data,pos,qLength);
+            pos=pos+qLength;
+            int vLength=Bytes.toInt(this.data,pos,4);
+            pos=pos+4;
+            String value=Bytes.toString(this.data,pos,vLength);
+            pos=pos+vLength;
+        }
 //        valueNodes.add();
         return valueNodes;
     }
@@ -82,14 +98,16 @@ public class KV {
         checkParameters(row, rLength, family, fLength);
         // Calculate length of tags area
         int valuesLength = 0;
+        int valueCount=0;
         if (values != null && !values.isEmpty()) {
             for (ValueNode v : values) {
-                //valueLengthSize+length
-                valuesLength += v.getLength() + 8;
+                //valueLengthSize
+                valuesLength += v.getLength();
+                valueCount++;
             }
         }
         int keyLength = (int) getKeyDataStructureSize(rLength, fLength);
-        byte[] bytes = new byte[(int) getKeyValueDataStructureSize(rLength, fLength, valuesLength)];
+        byte[] bytes = new byte[(int) getKeyValueDataStructureSize(rLength, fLength, valuesLength)+4];
         // Write key, value and key row length.
         int pos = 0;
         pos = Bytes.putInt(bytes, pos, keyLength);
@@ -101,7 +119,7 @@ public class KV {
         }
         // Add the tags after the value part
         if (valuesLength > 0) {
-            pos = Bytes.putLong(bytes, pos, valuesLength);
+            pos = Bytes.putInt(bytes, pos, valueCount);
             for (ValueNode valueNode : values) {
                 pos = Bytes.putBytes(bytes, pos, valueNode.getBuffer(), valueNode.getOffset(), valueNode.getLength());
             }
