@@ -1,8 +1,6 @@
 package input.store.mem;
 
 import input.util.Bytes;
-
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +9,6 @@ public class KV {
     private int length = 0;  // length of the KV starting from offset.
 
     public byte[] getData() {
-//        String s=new String("123456");
-//        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-
         return data;
     }
 
@@ -30,14 +25,22 @@ public class KV {
     }
 
     public String getRowKey() {
-        int keyLength=Bytes.toInt(this.data,0,4);
         int rLength=Bytes.toInt(this.data,8,4);
-        String row=Bytes.toString(this.data,16,rLength);
-        int fLength=Bytes.toInt(this.data,16+rLength,4);
-        String family=Bytes.toString(this.data,20+rLength,fLength);
-        long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
-        List<ValueNode> valueNodes = byteToValues(this.data, 28 + rLength + fLength, valueLength);
-        return new String(this.data, StandardCharsets.UTF_8);
+        return Bytes.toString(this.data,16,rLength);
+    }
+//    public void getAll() {
+//        int keyLength=Bytes.toInt(this.data,0,4);
+//        int rLength=Bytes.toInt(this.data,8,4);
+//        String row=Bytes.toString(this.data,16,rLength);
+//        int fLength=Bytes.toInt(this.data,16+rLength,4);
+//        String family=Bytes.toString(this.data,20+rLength,fLength);
+//        long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
+//        List<ValueNode> valueNodes = byteToValues(this.data, 28 + rLength + fLength, valueLength);
+//    }
+    public String getFamily(){
+        int rLength=Bytes.toInt(this.data,8,4);
+        int fLength=Bytes.toInt(this.data,12+rLength,4);
+        return Bytes.toString(this.data,16+rLength,fLength);
     }
 
     private List<ValueNode> byteToValues(byte[] data, int offset, long length) {
@@ -57,25 +60,12 @@ public class KV {
             pos=pos+4;
             String value=Bytes.toString(this.data,pos,vLength);
             pos=pos+vLength;
+            ValueNode valueNode=new ValueNode(timestamp,byteToType(type),
+                    qualifier.getBytes(),pos-qLength-4-vLength, qLength,
+                    value.getBytes(),pos-vLength,vLength);
+            valueNodes.add(valueNode);
         }
-//        valueNodes.add();
         return valueNodes;
-    }
-
-    public String getQualifier() {
-        return null;
-    }
-
-    public String getTime() {
-        return null;
-    }
-
-    public byte getType() {
-        return 0;
-    }
-
-    public String getValue() {
-        return null;
     }
 
     public KV(final byte[] row, final int rOffset, final int rLength,
@@ -153,20 +143,54 @@ public class KV {
         UpdateCells((byte) 30),
         MultiSearch((byte) 32),
         DeleteVersion((byte) 34);
-
-
         private final byte code;
 
         Type(final byte c) {
             this.code = c;
         }
-
         public byte getCode() {
             return this.code;
         }
 
     }
-
+    public static Type byteToType(byte b){
+        switch (b){
+            case 0:
+                return Type.CreateDB;
+            case 4:
+                return Type.createTable;
+            case 8:
+                return Type.DeleteDB;
+            case 10:
+                return Type.DeleteTable;
+            case 12:
+                return Type.OpenTransaction;
+            case 14:
+                return Type.CloseTransaction;
+            case 16:
+                return Type.PutCells;
+            case 18:
+                return Type.AlterTable;
+            case 20:
+                return Type.MergeVersion;
+            case 22:
+                return Type.UseVersion;
+            case 24:
+                return Type.ShowVersion;
+            case 26:
+                return Type.SingleSearch;
+            case 28:
+                return Type.DeleteCells;
+            case 30:
+                return Type.UpdateCells;
+            case 32:
+                return Type.MultiSearch;
+            case 34:
+                return Type.DeleteVersion;
+            default:
+                return null;
+        }
+    }
     private static void checkParameters(final byte[] row, final int rlength,
                                         final byte[] family, int flength)
             throws IllegalArgumentException {
@@ -226,6 +250,27 @@ public class KV {
         int getOffset() {
             return this.offset;
         }
+
+        public long getTime() {
+            return Bytes.toLong(this.bytes,0,8);
+        }
+
+        public Type getType() {
+            byte type=this.bytes[8];
+            return byteToType(type);
+        }
+
+        public String getQualifier() {
+            int qLength=Bytes.toInt(this.bytes,9,4);
+            return Bytes.toString(this.bytes,9+4,qLength);
+        }
+
+        public String getValue(){
+            int qLength=Bytes.toInt(this.bytes,9,4);
+            int vLength=Bytes.toInt(this.bytes,9+4+qLength,4);
+            return Bytes.toString(this.bytes,9+4+qLength+4,vLength);
+        }
+
     }
 
 
