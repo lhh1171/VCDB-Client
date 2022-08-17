@@ -259,30 +259,42 @@ public class KV {
             byte type=this.bytes[8];
             return byteToType(type);
         }
-
+        public int getQLength(){
+            return Bytes.toInt(this.bytes,9,4);
+        }
         public String getQualifier() {
-            int qLength=Bytes.toInt(this.bytes,9,4);
+            int qLength=getQLength();
             return Bytes.toString(this.bytes,9+4,qLength);
         }
-
+        public int getVLength(){
+            int qLength=getQLength();
+            return Bytes.toInt(this.bytes,9+4+qLength,4);
+        }
+        public int getVLength(int qLength){
+            return Bytes.toInt(this.bytes,9+4+qLength,4);
+        }
         public String getValue(){
-            int qLength=Bytes.toInt(this.bytes,9,4);
-            int vLength=Bytes.toInt(this.bytes,9+4+qLength,4);
+            int qLength=getQLength();
+            int vLength=getVLength(qLength);
             return Bytes.toString(this.bytes,9+4+qLength+4,vLength);
         }
-
     }
 
 
     public static class KVComparator implements RawComparator<ValueNode> {
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
-            return 0;
+
+            return Bytes.compareTo(b1, s1, l1, b2, s2, l2);
         }
 
         @Override
         public int compare(ValueNode o1, ValueNode o2) {
-            return 0;
+            int s1=o1.getOffset();
+            int l1=o1.getLength();
+            int s2=o1.getOffset();
+            int l2=o1.getLength();
+            return Bytes.compareTo(o1.bytes, s1, l1, o2.bytes, s2, l2);
         }
     }
 
