@@ -1,6 +1,8 @@
 package input.store.mem;
 
 import input.util.Bytes;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +25,12 @@ public class KV {
     public void setLength(int length) {
         this.length = length;
     }
-
+    public int getRLength(){
+        return Bytes.toInt(this.data,0,4);
+    }
     public String getRowKey() {
-        int rLength=Bytes.toInt(this.data,8,4);
-        return Bytes.toString(this.data,16,rLength);
+        int rLength=getRLength();
+        return Bytes.toString(this.data,rLength,rLength);
     }
 //    public void getAll() {
 //        int keyLength=Bytes.toInt(this.data,0,4);
@@ -37,16 +41,27 @@ public class KV {
 //        long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
 //        List<ValueNode> valueNodes = byteToValues(this.data, 28 + rLength + fLength, valueLength);
 //    }
+    public int getFLength(){
+        return Bytes.toInt(this.data,4+getRLength());
+    }
+    public int getFLength(int rLength){
+        return Bytes.toInt(this.data,4+rLength);
+    }
     public String getFamily(){
-        int rLength=Bytes.toInt(this.data,8,4);
-        int fLength=Bytes.toInt(this.data,12+rLength,4);
-        return Bytes.toString(this.data,16+rLength,fLength);
+        int rLength=getRLength();
+        int fLength=getFLength(rLength);
+        return Bytes.toString(this.data,8+rLength,fLength);
     }
 
-    private List<ValueNode> byteToValues(byte[] data, int offset, long length) {
-        List<ValueNode> valueNodes=new ArrayList<ValueNode>();
-        int pos=0;
+    public List<ValueNode> getValues() {
+        List<ValueNode> valueNodes=new ArrayList<>();
+        int rLength=getRLength();
+        int fLength=getFLength(rLength);
+        int pos=rLength+fLength+8;
+        int valuesLength=Bytes.toInt(this.data,pos,4);
+        pos=pos+4;
         int valueCount=Bytes.toInt(this.data,pos,4);
+        pos=pos+4;
         for (int i = 0; i < valueCount; i++) {
             long timestamp=Bytes.toLong(this.data,pos,8);
             pos=pos+8;
@@ -61,8 +76,8 @@ public class KV {
             String value=Bytes.toString(this.data,pos,vLength);
             pos=pos+vLength;
             ValueNode valueNode=new ValueNode(timestamp,byteToType(type),
-                    qualifier.getBytes(),pos-qLength-4-vLength, qLength,
-                    value.getBytes(),pos-vLength,vLength);
+                    qualifier.getBytes(StandardCharsets.UTF_8),0, qLength,
+                    value.getBytes(StandardCharsets.UTF_8),0,vLength);
             valueNodes.add(valueNode);
         }
         return valueNodes;
@@ -96,22 +111,22 @@ public class KV {
                 valueCount++;
             }
         }
-        int keyLength = (int) getKeyDataStructureSize(rLength, fLength);
-        byte[] bytes = new byte[(int) getKeyValueDataStructureSize(rLength, fLength, valuesLength)+4];
+        valuesLength=valuesLength+4;
+        byte[] bytes = new byte[(int) (getKeyValueDataStructureSize(rLength, fLength, valuesLength))];
         // Write key, value and key row length.
         int pos = 0;
-        pos = Bytes.putInt(bytes, pos, keyLength);
         pos = Bytes.putInt(bytes, pos, rLength);
         pos = Bytes.putBytes(bytes, pos, row, rOffset, rLength);
         pos = Bytes.putInt(bytes, pos,fLength);
         if (fLength != 0) {
             pos = Bytes.putBytes(bytes, pos, family, fOffset, fLength);
         }
+        pos =Bytes.putInt(bytes,pos,valuesLength);
         // Add the tags after the value part
         if (valuesLength > 0) {
             pos = Bytes.putInt(bytes, pos, valueCount);
             for (ValueNode valueNode : values) {
-                pos = Bytes.putBytes(bytes, pos, valueNode.getBuffer(), valueNode.getOffset(), valueNode.getLength());
+                pos = Bytes.putBytes(bytes, pos, valueNode.getBytes(), 0, valueNode.getLength());
             }
         }
         return bytes;
@@ -123,7 +138,7 @@ public class KV {
     }
 
     private long getKeyValueDataStructureSize(int rLength, int fLength, int valuesLength) {
-        return getKeyDataStructureSize(rLength, fLength) + valuesLength;
+        return getKeyDataStructureSize(rLength, fLength) + 4 + valuesLength;
     }
 
     public static enum Type {
@@ -210,7 +225,6 @@ public class KV {
     public static class ValueNode {
         //length=lengthSize+length
         private int length = 0;
-        private int offset = 0;
         private final byte[] bytes;  // an immutable byte array that contains the KV
 
         //qualifier,timestamp,actionType,value
@@ -224,7 +238,7 @@ public class KV {
                                        byte[] qualifier, int qOffset, int qLength,
                                        byte[] value, int vOffset, int vLength) {
             //timestampSize+typeSize+qLengthSize+vLengthSize+qLength+vLength
-            this.length = 8 + 1 + 2 + 2 + qLength + vLength;
+            this.length = 8 + 1 + 4 + 4 + qLength + vLength;
             byte[] bytes = new byte[this.length];
             int pos = 0;
             pos = Bytes.putLong(bytes, pos, timestamp);
@@ -235,7 +249,6 @@ public class KV {
             if (vLength != 0) {
                 pos = Bytes.putBytes(bytes, pos, value, vOffset, vLength);
             }
-            this.offset = pos;
             return bytes;
         }
 
@@ -243,12 +256,8 @@ public class KV {
             return this.length;
         }
 
-        public byte[] getBuffer() {
+        public byte[] getBytes() {
             return this.bytes;
-        }
-
-        int getOffset() {
-            return this.offset;
         }
 
         public long getTime() {
@@ -290,11 +299,9 @@ public class KV {
 
         @Override
         public int compare(ValueNode o1, ValueNode o2) {
-            int s1=o1.getOffset();
             int l1=o1.getLength();
-            int s2=o1.getOffset();
             int l2=o1.getLength();
-            return Bytes.compareTo(o1.bytes, s1, l1, o2.bytes, s2, l2);
+            return Bytes.compareTo(o1.bytes, 0, l1, o2.bytes, 0, l2);
         }
     }
 
