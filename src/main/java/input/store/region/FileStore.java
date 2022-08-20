@@ -1,5 +1,7 @@
 package input.store.region;
 
+import input.entity.Cell.ColumnFamilyCell;
+import input.store.mem.ColumnFamilyMeta;
 import input.store.mem.KV;
 import input.store.mem.KeyValueSkipListSet;
 
@@ -19,7 +21,7 @@ public class FileStore {
      * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)包含RegionMeta (类）
      * MetaIndex int(每一个RegionMeta的物理地址,按照Key的顺序排列)(每个单位的大小固定)
      * DataIndex int(每一个KV的物理地址)
-     * MetaSet  这个列族的元数据，包括列族的限制（ColumnFamilyCell）
+     * CF_Meta      这个列族的元数据，包括列族的限制（ColumnFamilyCell）
      * DataSet   (不分，一直往后累加，不用打乱排序）
      * */
     private byte[] data = null;
@@ -30,7 +32,7 @@ public class FileStore {
     public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
         this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
     }
-    public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, int dataIndexOffset, int DataSetOffset, int metaIndexOffset, int MetaSetOffset) {
+    public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, int dataIndexOffset, int DataSetOffset, ColumnFamilyMeta columnFamilyMeta, int metaIndexOffset, int MetaSetOffset) {
         this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
     }
 }
