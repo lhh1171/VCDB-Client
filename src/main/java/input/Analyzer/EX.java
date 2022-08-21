@@ -111,14 +111,14 @@ public class EX {
                         System.err.println("报错重复设置type属性");
                     }
                 } else if ("min".equalsIgnoreCase(cell.getKey())) {
-                    if (columnFamilyCell.getMin() == Double.MIN_VALUE) {
-                        columnFamilyCell.setMin(Double.parseDouble(cell.getValue()));
+                    if (columnFamilyCell.getMin() == Long.MIN_VALUE) {
+                        columnFamilyCell.setMin(Long.parseLong(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置min属性");
                     }
                 } else if ("max".equalsIgnoreCase(cell.getKey())) {
-                    if (columnFamilyCell.getMax() == Double.MAX_VALUE) {
-                        columnFamilyCell.setMax(Double.parseDouble(cell.getValue()));
+                    if (columnFamilyCell.getMax() == Long.MAX_VALUE) {
+                        columnFamilyCell.setMax(Long.parseLong(cell.getValue()));
                     } else {
                         System.err.println("报错重复设置max属性");
                     }

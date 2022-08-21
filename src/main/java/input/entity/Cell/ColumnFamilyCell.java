@@ -8,8 +8,8 @@ package input.entity.Cell;
 public class ColumnFamilyCell{
     private String cf_name;
     private String type;
-    private double min=Double.MIN_VALUE;
-    private double max=Double.MAX_VALUE;
+    private long min=Long.MIN_VALUE;
+    private long max=Long.MAX_VALUE;
     private Boolean unique;
     private Boolean isNull;
     private int Version=Integer.MAX_VALUE;
@@ -55,11 +55,11 @@ public class ColumnFamilyCell{
         this.type = type;
     }
 
-    public void setMin(double min) {
+    public void setMin(long min) {
         this.min = min;
     }
 
-    public void setMax(double max) {
+    public void setMax(long max) {
         this.max = max;
     }
 
