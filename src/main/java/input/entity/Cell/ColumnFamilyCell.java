@@ -13,7 +13,7 @@ public class ColumnFamilyCell{
     private Boolean unique;
     private Boolean isNull;
     private int Version=Integer.MAX_VALUE;
-    private String method;
+//    private String method;
 
     public String getCf_name() {
         return cf_name;
@@ -43,9 +43,9 @@ public class ColumnFamilyCell{
         return Version;
     }
 
-    public String getMethod() {
-        return method;
-    }
+//    public String getMethod() {
+//        return method;
+//    }
 
     public void setCf_name(String cf_name) {
         this.cf_name = cf_name;
@@ -75,7 +75,7 @@ public class ColumnFamilyCell{
         Version = version;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
+//    public void setMethod(String method) {
+//        this.method = method;
+//    }
 }

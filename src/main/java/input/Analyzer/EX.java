@@ -140,13 +140,15 @@ public class EX {
                     } else {
                         System.err.println("报错重复设置c_name属性");
                     }
-                } else if ("method".equalsIgnoreCase(cell.getKey())) {
-                    if (columnFamilyCell.getType() == null) {
-                        columnFamilyCell.setType(cell.getValue());
-                    } else {
-                        System.err.println("报错重复设置method属性");
-                    }
-                } else {
+                }
+//                else if ("method".equalsIgnoreCase(cell.getKey())) {
+//                    if (columnFamilyCell.getMethod() == null) {
+//                        columnFamilyCell.setMethod(cell.getValue());
+//                    } else {
+//                        System.err.println("报错重复设置method属性");
+//                    }
+//                }
+                else {
                     System.err.println("出现未知属性，打印key");
                 }
             }

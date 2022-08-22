@@ -125,6 +125,7 @@ public class KV {
         // Add the tags after the value part
         if (valuesLength > 0) {
             pos = Bytes.putInt(bytes, pos, valueCount);
+            assert values != null;
             for (ValueNode valueNode : values) {
                 pos = Bytes.putBytes(bytes, pos, valueNode.getBytes(), 0, valueNode.getLength());
             }
