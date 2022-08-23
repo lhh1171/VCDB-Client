@@ -1,8 +1,9 @@
 package input.store.region;
 
+import input.util.Bytes;
+
 //存储a region的具体信息(元数据)
 public class RegionInfo {
-    private int regionInfoLengthSize = 0;
     private int regionInfoLength = 0;
     //Region 创建的时间戳
     long timeStamp;
@@ -12,6 +13,11 @@ public class RegionInfo {
     private byte[] endKey;
     private byte[] startKey;
     private String tableName = null;
+    private final byte[] data;
+
+    public byte[] getData() {
+        return data;
+    }
 
     public RegionInfo(long timeStamp, boolean split, String encodedName, byte[] endKey, byte[] startKey, String tableName) {
         this.encodedName = encodedName;
@@ -21,13 +27,32 @@ public class RegionInfo {
         this.split = split;
         this.tableName = tableName;
         this.regionInfoLength = 8 + 1 + encodedName.getBytes().length + endKey.length + startKey.length + tableName.getBytes().length;
-        //encodedNameLengthSize+endKeyLengthSize+startKeyLengthSize+tableNameLengthSize
-        this.regionInfoLengthSize = 8 + 8 + 8 + 8;
+        byte spl=0;
+        if (split){
+            spl=1;
+        }
+        this.data=createByteArray(timeStamp,spl,encodedName,endKey,startKey,tableName);
+        this.regionInfoLength=this.data.length;
     }
 
-    public int getRegionInfoLengthSize() {
-        return regionInfoLengthSize;
+    private byte[] createByteArray(long timeStamp, byte spl,
+                                   String encodedName, byte[] endKey,
+                                   byte[] startKey, String tableName) {
+        int pos=0;
+        byte[] bytes = new byte[8+1+4+encodedName.getBytes().length+4+endKey.length+4+startKey.length+4+tableName.getBytes().length];
+        pos=Bytes.putLong(bytes,pos,timeStamp);
+        pos= Bytes.putByte(bytes,pos,spl);
+        pos=Bytes.putInt(bytes,pos,encodedName.getBytes().length);
+        pos=Bytes.putBytes(bytes,pos,encodedName.getBytes(),0,encodedName.getBytes().length);
+        pos=Bytes.putInt(bytes,pos,endKey.length);
+        pos=Bytes.putBytes(bytes,pos,endKey,0,endKey.length);
+        pos=Bytes.putInt(bytes,pos,startKey.length);
+        pos=Bytes.putBytes(bytes,pos,startKey,0,startKey.length);
+        pos=Bytes.putInt(bytes,pos,tableName.getBytes().length);
+        pos=Bytes.putBytes(bytes,pos,tableName.getBytes(),0,tableName.getBytes().length);
+        return bytes;
     }
+
 
     public int getRegionInfoLength() {
         return regionInfoLength;
@@ -57,9 +82,6 @@ public class RegionInfo {
         return tableName;
     }
 
-    public void setRegionInfoLengthSize(int regionInfoLengthSize) {
-        this.regionInfoLengthSize = regionInfoLengthSize;
-    }
 
     public void setRegionInfoLength(int regionInfoLength) {
         this.regionInfoLength = regionInfoLength;

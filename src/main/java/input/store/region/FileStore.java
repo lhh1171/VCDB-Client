@@ -4,6 +4,10 @@ import input.entity.Cell.ColumnFamilyCell;
 import input.store.mem.ColumnFamilyMeta;
 import input.store.mem.KV;
 import input.store.mem.KeyValueSkipListSet;
+import input.util.Bytes;
+
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * @ClassName Region
@@ -25,14 +29,38 @@ public class FileStore {
      * DataSet   (不分，一直往后累加，不用打乱排序）
      * */
     private byte[] data = null;
+    private int length = 0;
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public int getLength() {
+        return length;
+    }
 
     public FileStore() {
     }
 
-    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
-        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
-    }
-    public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, int dataIndexOffset, int DataSetOffset, ColumnFamilyMeta columnFamilyMeta, int metaIndexOffset, int MetaSetOffset) {
-        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
+//    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
+//        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
+//    }
+    public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
+        this.data = new byte[4 + regionInfo.getRegionInfoLength() + 4 +4+ dataSet.getByteSize() + 4 + columnFamilyMeta.getLength()];
+        int dataSetCount=dataSet.size();
+        int pos=0;
+        pos= Bytes.putInt(this.data,pos,regionInfo.getRegionInfoLength());
+        pos=Bytes.putBytes(this.data,pos,regionInfo.getData(),0,regionInfo.getRegionInfoLength());
+        pos= Bytes.putInt(this.data,pos,dataSetCount);
+        //获取key和value的set
+        for (KV kv : dataSet) {
+            ConcurrentNavigableMap.Entry entry = (ConcurrentNavigableMap.Entry) kv;        //把hashmap转成Iterator再迭代到entry
+            KV val = (KV) entry.getValue();    //从entry获取value
+            pos = Bytes.putInt(this.data, pos, val.getLength());
+            pos = Bytes.putBytes(this.data, pos, val.getData(), 0, val.getLength());
+        }
+        pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
+        pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
+        this.length=this.data.length;
     }
 }
