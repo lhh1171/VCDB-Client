@@ -5,9 +5,23 @@ import input.entity.Delete.DeleteTable;
 import input.entity.Post.*;
 import input.entity.Put.CreateDB;
 import input.entity.Put.CreateTable;
+import input.store.mem.KV;
+import input.store.wal.VCLog;
+import input.store.wal.WalEdit;
+
+import java.util.Date;
+
+import static input.store.mem.KV.byteToType;
 
 public class VCDBAdmin {
-    public void createDB(CreateDB createDB) {
+    public void createDB(CreateDB createDB,String dBName) {
+        KV.ValueNode valueNode=new KV.ValueNode((new Date()).getTime(),byteToType((byte) 0),null,0,0,null,0,0);
+        WalEdit walEdit = VCLog.entry.get(dBName.getBytes());
+        if (walEdit==null){
+            VCLog.entry.put(dBName.getBytes(),new WalEdit());
+        }
+        WalEdit  newWalEdit = VCLog.entry.get(dBName.getBytes());
+        newWalEdit.actions.add(valueNode);
 
     }
 

@@ -20,7 +20,7 @@ Region               (Regions for the table)
             KV    (Blocks within a StoreFile within a Store for each Region for the table)*/
 public class VCRegion {
     //regionID,VCRegionStores
-    byte[] regionID;
+    byte[] regionWServerID;
     List<FileStore> fileStores;
     List<MemStore> memStores;
 }

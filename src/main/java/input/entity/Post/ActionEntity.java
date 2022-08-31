@@ -39,7 +39,6 @@ public class ActionEntity {
         }else {
             this.RegularAttribute.put(key,obj);
         }
-
     }
     public void addCompoundAttribute(String key,List<HashMap<String, String>> list){
         if (CompoundAttribute==null){
