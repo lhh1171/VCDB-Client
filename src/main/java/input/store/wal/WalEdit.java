@@ -10,5 +10,4 @@ public class WalEdit {
         actions=new ArrayList<>();
     }
     public void syncLog(){}
-
 }

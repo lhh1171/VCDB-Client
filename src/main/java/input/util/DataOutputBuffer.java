@@ -36,7 +36,8 @@ public class DataOutputBuffer extends DataOutputStream {
         }
     }
 
-    private Buffer buffer;
+
+    private final Buffer buffer;
 
     /**
      * Constructs a new empty buffer.
@@ -91,4 +92,5 @@ public class DataOutputBuffer extends DataOutputStream {
     public void writeTo(OutputStream out) throws IOException {
         buffer.writeTo(out);
     }
+
 }

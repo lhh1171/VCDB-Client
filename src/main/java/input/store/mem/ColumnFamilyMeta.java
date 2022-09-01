@@ -29,7 +29,7 @@ public class ColumnFamilyMeta {
         return length;
     }
     public ColumnFamilyMeta(boolean unique,boolean isNull,long min,
-                            long max,int version,CFType type,
+                            long max,CFType type,
                             byte[] family, int fOffset, int fLength){
         byte uni=0;
         byte isNil=0;
@@ -40,12 +40,12 @@ public class ColumnFamilyMeta {
             isNil=1;
         }
         this.data = createByteArray(uni, isNil, min,
-                max, version, type, family,fOffset,fLength);
+                max,  type, family,fOffset,fLength);
         this.length = this.data.length;
     }
 
     private byte[] createByteArray(byte unique, byte isNull, long min,
-                                   long max, int version, CFType type,
+                                   long max, CFType type,
                                    byte[] family, int fOffset, int fLength) {
         byte[] bytes = new byte[1+1+8+8+4+1+4+fLength];
         int pos=0;
@@ -53,7 +53,6 @@ public class ColumnFamilyMeta {
         pos=Bytes.putByte(bytes,pos,isNull);
         pos=Bytes.putLong(bytes,pos,min);
         pos=Bytes.putLong(bytes,pos,max);
-        pos=Bytes.putInt(bytes,pos,version);
         pos=Bytes.putByte(bytes,pos,type.getCode());
         pos=Bytes.putInt(bytes,pos,fLength);
         if (fLength != 0) {
@@ -75,19 +74,14 @@ public class ColumnFamilyMeta {
         return Bytes.toLong(this.data,10,8);
     }
 
-    public int getVersion() {
-        return Bytes.toInt(this.data,18,4);
-    }
-
-
     public CFType getType() {
-        return byteToCFType(data[22]);
+        return byteToCFType(data[18]);
     }
     public int getCFLength() {
-        return Bytes.toInt(this.data,23,4);
+        return Bytes.toInt(this.data,19,4);
     }
     public String getCf_name() {
-        return Bytes.toString(this.data,24,getCFLength());
+        return Bytes.toString(this.data,23,getCFLength());
     }
 
     public static enum CFType {

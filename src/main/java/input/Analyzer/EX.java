@@ -59,7 +59,7 @@ public class EX {
                 requestEntity = getCreateDB(actionEntity);
                 System.out.println("createDB----------");
                 //Before using the VCdbAdmin object, check whether it is initialized
-                vcdbAdmin.createDB((CreateDB) requestEntity,putUrl[1]);
+                vcdbAdmin.createDB(putUrl[1]);
                 break;
             case 3:
                 requestEntity = getCreateTable(actionEntity);

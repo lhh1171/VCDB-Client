@@ -53,7 +53,6 @@ public class RegionInfo {
         return bytes;
     }
 
-
     public int getRegionInfoLength() {
         return regionInfoLength;
     }

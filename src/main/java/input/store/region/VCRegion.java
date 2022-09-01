@@ -22,5 +22,4 @@ public class VCRegion {
     //regionID,VCRegionStores
     byte[] regionWServerID;
     List<FileStore> fileStores;
-    List<MemStore> memStores;
 }

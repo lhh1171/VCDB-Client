@@ -54,13 +54,12 @@ public class FileStore {
         pos= Bytes.putInt(this.data,pos,dataSetCount);
         //获取key和value的set
         for (KV kv : dataSet) {
-            ConcurrentNavigableMap.Entry entry = (ConcurrentNavigableMap.Entry) kv;        //把hashmap转成Iterator再迭代到entry
-            KV val = (KV) entry.getValue();    //从entry获取value
-            pos = Bytes.putInt(this.data, pos, val.getLength());
-            pos = Bytes.putBytes(this.data, pos, val.getData(), 0, val.getLength());
+            pos = Bytes.putInt(this.data, pos, kv.getLength());
+            pos = Bytes.putBytes(this.data, pos, kv.getData(), 0, kv.getLength());
         }
         pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
         pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
         this.length=this.data.length;
     }
+
 }

@@ -6,23 +6,37 @@ import input.entity.Post.*;
 import input.entity.Put.CreateDB;
 import input.entity.Put.CreateTable;
 import input.store.mem.KV;
+import input.store.mem.MemStore;
 import input.store.wal.VCLog;
 import input.store.wal.WalEdit;
 
 import java.util.Date;
+import java.util.List;
 
 import static input.store.mem.KV.byteToType;
 
 public class VCDBAdmin {
-    public void createDB(CreateDB createDB,String dBName) {
-        KV.ValueNode valueNode=new KV.ValueNode((new Date()).getTime(),byteToType((byte) 0),null,0,0,null,0,0);
+    MemStore memStore;
+    public VCDBAdmin(){
+        memStore=new MemStore();
+    }
+    public void createDB(String dBName) {
+        KV.ValueNode valueNode=new KV.ValueNode((new Date()).getTime(),byteToType((byte) 0),"".getBytes(),0,"".getBytes().length,"".getBytes(),0,"".getBytes().length);
         WalEdit walEdit = VCLog.entry.get(dBName.getBytes());
         if (walEdit==null){
             VCLog.entry.put(dBName.getBytes(),new WalEdit());
         }
         WalEdit  newWalEdit = VCLog.entry.get(dBName.getBytes());
         newWalEdit.actions.add(valueNode);
-
+        if (memStore.kvset.get("")==null){
+            memStore.add(new KV("".getBytes(),0,"".getBytes().length,"".getBytes(),0,"".getBytes().length,null));
+        }
+        KV kv=memStore.kvset.get("");
+        List<KV.ValueNode> values = kv.getValues();
+        values.add(valueNode);
+        memStore.kvset.remove(kv);
+        KV newKv=new KV("".getBytes(),0,"".getBytes().length,"".getBytes(),0,"".getBytes().length,values);
+        memStore.add(newKv);
     }
 
     public void createTable(CreateTable createTable) {

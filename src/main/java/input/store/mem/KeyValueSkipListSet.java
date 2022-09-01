@@ -151,7 +151,17 @@ public class KeyValueSkipListSet implements NavigableSet<KV> {
     public KV get(KV kv) {
         return this.delegatee.get(kv);
     }
-
+    public KV get(String key) {
+        Iterator iter = iterator();        //获取key和value的set
+        while (iter.hasNext()) {
+            ConcurrentNavigableMap.Entry entry = (ConcurrentNavigableMap.Entry) iter.next();        //把hashmap转成Iterator再迭代到entry
+            KV val = (KV)entry.getKey();//从entry获取value
+            if (key.equals(val.getRowKey())){
+                return val;
+            }
+        }
+        return null;
+    }
     public int size() {
         return this.delegatee.size();
     }
@@ -168,9 +178,8 @@ public class KeyValueSkipListSet implements NavigableSet<KV> {
       int byteSize=0;
       Iterator iter = iterator();        //获取key和value的set
       while (iter.hasNext()) {
-        ConcurrentNavigableMap.Entry entry = (ConcurrentNavigableMap.Entry) iter.next();        //把hashmap转成Iterator再迭代到entry
-        KV val = (KV)entry.getValue();    //从entry获取value
-        byteSize+=4+val.getLength();
+        Object entry = iter.next();        //把hashmap转成Iterator再迭代到entry
+        byteSize+=4+((KV)entry).getLength();
       }
       return byteSize;
     }

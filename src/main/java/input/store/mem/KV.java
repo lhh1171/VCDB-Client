@@ -291,18 +291,18 @@ public class KV {
     }
 
 
-    public static class KVComparator implements RawComparator<ValueNode> {
+    public static class KVComparator implements RawComparator<KV> {
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
 
             return Bytes.compareTo(b1, s1, l1, b2, s2, l2);
         }
 
+
+
         @Override
-        public int compare(ValueNode o1, ValueNode o2) {
-            int l1=o1.getLength();
-            int l2=o1.getLength();
-            return Bytes.compareTo(o1.bytes, 0, l1, o2.bytes, 0, l2);
+        public int compare(KV o1, KV o2) {
+            return o1.getRowKey().compareTo(o2.getRowKey());
         }
     }
 

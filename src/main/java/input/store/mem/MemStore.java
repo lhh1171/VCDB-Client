@@ -7,12 +7,15 @@ public class MemStore {
     // Used to track when to flush
     long timeOfOldestEdit = Long.MAX_VALUE;
     AtomicLong size;
-    KeyValueSkipListSet kvset;
-
+    public KeyValueSkipListSet kvset;
     // Snapshot of memstore.  Made for flusher.
     volatile KeyValueSkipListSet snapshot;
+    public MemStore(){
+        size=new AtomicLong(0);
+        kvset=new KeyValueSkipListSet(new KV.KVComparator());
+    }
 
-    long add(final KV kv) {
+    public long add(final KV kv) {
         KV toAdd = maybeCloneWithAllocator(kv);
         return internalAdd(toAdd);
     }
