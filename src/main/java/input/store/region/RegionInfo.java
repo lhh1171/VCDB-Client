@@ -16,8 +16,9 @@ public class RegionInfo {
     private final byte[] data;
     private int regionInfoLength = 0;
 
-    public RegionInfo getInstance(byte[] data){
-        return null;
+    public RegionInfo(byte[] data){
+        this.data=data;
+        this.regionInfoLength=data.length;
     }
     public RegionInfo(long timeStamp, boolean split, String encodedName, byte[] endKey, byte[] startKey, String tableName) {
         this.regionInfoLength = 8 + 1 + 4 + encodedName.getBytes().length + 4 + endKey.length + 4 + startKey.length + 4 + tableName.getBytes().length;

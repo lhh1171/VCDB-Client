@@ -46,15 +46,15 @@ public class FileStore {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
     public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
-        this.data = new byte[4 + regionInfo.getRegionInfoLength() + 4 +4+ dataSet.getByteSize() + 4 + columnFamilyMeta.getLength()];
+        this.data = new byte[4 + regionInfo.getRegionInfoLength() + 4 + columnFamilyMeta.getLength() + 4 + 4 + dataSet.getByteSize()];
         int dataSetCount=dataSet.size();
         int pos=0;
         pos= Bytes.putInt(this.data,pos,regionInfo.getRegionInfoLength());
         pos=Bytes.putBytes(this.data,pos,regionInfo.getData(),0,regionInfo.getRegionInfoLength());
-        pos= Bytes.putInt(this.data,pos,dataSetCount);
         pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
         pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
 
+        pos= Bytes.putInt(this.data,pos,dataSetCount);
         //获取key和value的set
         for (KV kv : dataSet) {
             pos = Bytes.putInt(this.data, pos, kv.getLength());
@@ -65,21 +65,21 @@ public class FileStore {
     public int getRegionInfoLength(){
         return Bytes.toInt(this.data,0,4);
     }
-    public byte[] getRegionInfo(){
-        return Bytes.subByte(this.data,4,getRegionInfoLength());
+    public RegionInfo getRegionInfo(){
+        return new RegionInfo(Bytes.subByte(this.data,4,getRegionInfoLength()));
     }
     public int getMetaLength(){
         return Bytes.toInt(this.data,4+getRegionInfoLength(),4);
     }
-    public byte[] getMeta(){
-        return Bytes.subByte(this.data,8+getRegionInfoLength(),getMetaLength());
+    public ColumnFamilyMeta getMeta(){
+        return new ColumnFamilyMeta(Bytes.subByte(this.data,8+getRegionInfoLength(),getMetaLength()));
     }
     public int getDataSetCount(){
         return Bytes.toInt(this.data,8+getRegionInfoLength()+getMetaLength(),4);
     }
     public KeyValueSkipListSet getDataSet(){
         KeyValueSkipListSet kvs = new KeyValueSkipListSet(new KV.KVComparator());
-        int pos=12+getRegionInfoLength();
+        int pos=4+getRegionInfoLength()+4+getMetaLength()+4;
         for (int i = 0; i < getDataSetCount(); i++) {
             int kvLength=Bytes.toInt(this.data,pos,4);
             pos+=4;

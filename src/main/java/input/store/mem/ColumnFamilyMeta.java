@@ -23,10 +23,6 @@ public class ColumnFamilyMeta {
     private byte[] data=null;
     private int length = 0;
 
-    public static ColumnFamilyMeta getInstance(byte[] data) {
-        return new ColumnFamilyMeta(data);
-    }
-
     public byte[] getData() {
         return data;
     }

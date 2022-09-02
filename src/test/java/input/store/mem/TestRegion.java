@@ -50,8 +50,40 @@ public class TestRegion {
         KV kv=new KV(row,0,row.length,family,0,family.length,values);
         KeyValueSkipListSet kvs = new KeyValueSkipListSet(new KV.KVComparator());
         kvs.add(kv);
-        FileStore fileStore=new FileStore(regionInfo,kvs,cfMeta);
-        System.out.println("===================================");
 
+        System.out.println("===================================");
+        FileStore fileStore=new FileStore(regionInfo,kvs,cfMeta);
+        RegionInfo regionInfo1 = fileStore.getRegionInfo();
+        System.out.println(regionInfo1.getTimeStamp());
+        System.out.println(regionInfo1.isSplit());
+        System.out.println(regionInfo1.getEncodedName());
+        System.out.println(Bytes.toString(regionInfo1.getStartKey()) );
+        System.out.println(Bytes.toString(regionInfo1.getEndKey()) );
+        System.out.println("===================================");
+        KeyValueSkipListSet dataSet = fileStore.getDataSet();
+        for (KV kv1:dataSet){
+            System.out.println(kv1.getRowKey());
+            System.out.println(kv1.getFamily());
+            List<KV.ValueNode> vv=kv1.getValues();
+            System.out.println("...........................");
+            for (KV.ValueNode valueNode:vv) {
+                System.out.println(valueNode.getTime());
+                System.out.println(valueNode.getType());
+                System.out.println(valueNode.getQLength());
+                System.out.println(valueNode.getQualifier());
+                System.out.println(valueNode.getVLength());
+                System.out.println(valueNode.getValue());
+            }
+        }
+        System.out.println("===================================");
+        ColumnFamilyMeta meta = fileStore.getMeta();
+        System.out.println(meta.isUnique());
+        System.out.println(meta.isNull());
+        System.out.println(meta.getMin());
+        System.out.println(meta.getMax());
+        System.out.println(meta.getType());
+        System.out.println(meta.getCFLength());
+        System.out.println(meta.getCf_name());
+        System.out.println("===================================");
     }
 }
