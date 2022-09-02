@@ -52,14 +52,40 @@ public class FileStore {
         pos= Bytes.putInt(this.data,pos,regionInfo.getRegionInfoLength());
         pos=Bytes.putBytes(this.data,pos,regionInfo.getData(),0,regionInfo.getRegionInfoLength());
         pos= Bytes.putInt(this.data,pos,dataSetCount);
+        pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
+        pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
+
         //获取key和value的set
         for (KV kv : dataSet) {
             pos = Bytes.putInt(this.data, pos, kv.getLength());
             pos = Bytes.putBytes(this.data, pos, kv.getData(), 0, kv.getLength());
         }
-        pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
-        pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
         this.length=this.data.length;
     }
-
+    public int getRegionInfoLength(){
+        return Bytes.toInt(this.data,0,4);
+    }
+    public byte[] getRegionInfo(){
+        return Bytes.subByte(this.data,4,getRegionInfoLength());
+    }
+    public int getMetaLength(){
+        return Bytes.toInt(this.data,4+getRegionInfoLength(),4);
+    }
+    public byte[] getMeta(){
+        return Bytes.subByte(this.data,8+getRegionInfoLength(),getMetaLength());
+    }
+    public int getDataSetCount(){
+        return Bytes.toInt(this.data,8+getRegionInfoLength()+getMetaLength(),4);
+    }
+    public KeyValueSkipListSet getDataSet(){
+        KeyValueSkipListSet kvs = new KeyValueSkipListSet(new KV.KVComparator());
+        int pos=12+getRegionInfoLength();
+        for (int i = 0; i < getDataSetCount(); i++) {
+            int kvLength=Bytes.toInt(this.data,pos,4);
+            pos+=4;
+            kvs.add(new KV(Bytes.subByte(this.data,pos,kvLength)));
+            pos+=kvLength;
+        }
+        return kvs;
+    }
 }

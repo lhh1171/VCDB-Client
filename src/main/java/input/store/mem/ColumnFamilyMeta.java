@@ -22,6 +22,11 @@ import input.util.Bytes;
 public class ColumnFamilyMeta {
     private byte[] data=null;
     private int length = 0;
+
+    public static ColumnFamilyMeta getInstance(byte[] data) {
+        return new ColumnFamilyMeta(data);
+    }
+
     public byte[] getData() {
         return data;
     }
@@ -42,6 +47,11 @@ public class ColumnFamilyMeta {
         this.data = createByteArray(uni, isNil, min,
                 max,  type, family,fOffset,fLength);
         this.length = this.data.length;
+    }
+
+    public ColumnFamilyMeta(byte[] data){
+        this.data=data;
+        this.length=data.length;
     }
 
     private byte[] createByteArray(byte unique, byte isNull, long min,

@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class KeyValueSkipListSet implements NavigableSet<KV> {
     private final ConcurrentNavigableMap<KV, KV> delegatee;
 
-    KeyValueSkipListSet(final KV.KVComparator c) {
+    public KeyValueSkipListSet(final KV.KVComparator c) {
         this.delegatee = new ConcurrentSkipListMap(c);
     }
 

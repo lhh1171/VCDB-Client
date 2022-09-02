@@ -91,8 +91,9 @@ public class KV {
         this.length = this.data.length;
     }
 
-    public KV() {
-
+    public KV(byte[] data) {
+        this.data=data;
+        this.length=data.length;
     }
 
     //row is rowKey
