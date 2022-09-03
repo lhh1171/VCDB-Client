@@ -6,8 +6,6 @@ import input.store.mem.KV;
 import input.store.mem.KeyValueSkipListSet;
 import input.util.Bytes;
 
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * @ClassName Region
@@ -23,11 +21,13 @@ public class FileStore {
      * data 存储多个kv对*/
     /*
      * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)包含RegionMeta (类）
+     * pageIndex
      * MetaIndex int(每一个RegionMeta的物理地址,按照Key的顺序排列)(每个单位的大小固定)
      * DataIndex int(每一个KV的物理地址)
      * CF_Meta      这个列族的元数据，包括列族的限制（ColumnFamilyCell）
      * DataSet   (不分，一直往后累加，不用打乱排序）
      * */
+
     private byte[] data = null;
     private int length = 0;
 
@@ -40,7 +40,10 @@ public class FileStore {
     }
 
     public FileStore() {
+
     }
+
+
 
 //    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];

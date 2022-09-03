@@ -25,6 +25,7 @@ public class KV {
     public void setLength(int length) {
         this.length = length;
     }
+
     public int getRLength(){
         return Bytes.toInt(this.data,0,4);
     }
@@ -32,6 +33,7 @@ public class KV {
         int rLength=getRLength();
         return Bytes.toString(this.data,rLength,rLength);
     }
+
 //    public void getAll() {
 //        int keyLength=Bytes.toInt(this.data,0,4);
 //        int rLength=Bytes.toInt(this.data,8,4);
@@ -41,12 +43,15 @@ public class KV {
 //        long valueLength=Bytes.toLong(this.data,20+rLength+fLength,8);
 //        List<ValueNode> valueNodes = byteToValues(this.data, 28 + rLength + fLength, valueLength);
 //    }
+
     public int getFLength(){
         return Bytes.toInt(this.data,4+getRLength());
     }
+
     public int getFLength(int rLength){
         return Bytes.toInt(this.data,4+rLength);
     }
+
     public String getFamily(){
         int rLength=getRLength();
         int fLength=getFLength(rLength);
@@ -165,10 +170,10 @@ public class KV {
         Type(final byte c) {
             this.code = c;
         }
+
         public byte getCode() {
             return this.code;
         }
-
     }
     public static Type byteToType(byte b){
         switch (b){
@@ -208,15 +213,19 @@ public class KV {
                 return null;
         }
     }
+
     private static void checkParameters(final byte[] row, final int rlength,
                                         final byte[] family, int flength)
             throws IllegalArgumentException {
+
         if (rlength > Short.MAX_VALUE) {
             throw new IllegalArgumentException("Row > " + Short.MAX_VALUE);
         }
+
         if (row == null) {
             throw new IllegalArgumentException("Row is null");
         }
+
         // Family length
         flength = family == null ? 0 : flength;
         if (flength > Byte.MAX_VALUE) {
@@ -270,36 +279,40 @@ public class KV {
             byte type=this.bytes[8];
             return byteToType(type);
         }
+
         public int getQLength(){
             return Bytes.toInt(this.bytes,9,4);
         }
+
         public String getQualifier() {
             int qLength=getQLength();
             return Bytes.toString(this.bytes,9+4,qLength);
         }
+
         public int getVLength(){
             int qLength=getQLength();
             return Bytes.toInt(this.bytes,9+4+qLength,4);
         }
+
         public int getVLength(int qLength){
             return Bytes.toInt(this.bytes,9+4+qLength,4);
         }
+
         public String getValue(){
             int qLength=getQLength();
             int vLength=getVLength(qLength);
             return Bytes.toString(this.bytes,9+4+qLength+4,vLength);
         }
+
     }
 
 
     public static class KVComparator implements RawComparator<KV> {
+
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
-
             return Bytes.compareTo(b1, s1, l1, b2, s2, l2);
         }
-
-
 
         @Override
         public int compare(KV o1, KV o2) {

@@ -13,4 +13,5 @@ MemStoreLAB 基本上是一个指针碰撞分配器，
 * 并且老一代会逐渐变得更加碎片化，直到发生 stop-the-world 压缩收集。
 */
 public class MemStoreLAB {
+
 }

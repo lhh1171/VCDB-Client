@@ -4,11 +4,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 //对应的是一个表的一个版本的一个列族的数据
 public class MemStore {
+
     // Used to track when to flush
     long timeOfOldestEdit = Long.MAX_VALUE;
     AtomicLong size;
     public KeyValueSkipListSet kvset;
-    // Snapshot of memstore.  Made for flusher.
+
+    // Snapshot of memStore.  Made for flusher.
     volatile KeyValueSkipListSet snapshot;
     public MemStore(){
         size=new AtomicLong(0);
@@ -57,6 +59,7 @@ public class MemStore {
         this.size.addAndGet(s);
         return s;
     }
+
     /*
      * Calculate how the MemStore size has changed.  Includes overhead of the
      * backing Map.
@@ -67,6 +70,7 @@ public class MemStore {
     private long heapSizeChange(final KV kv, final boolean notPresent) {
         return notPresent ? align(kv) : 0;
     }
+
     //将kv对齐,8的整数
     private long align(KV kv) {
         return 8;
