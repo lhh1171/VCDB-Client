@@ -1,5 +1,9 @@
 package input.store.region;
 
+import input.store.mem.KeyValueSkipListSet;
+
+import java.util.HashMap;
+
 /**
  * @ClassName RegionMeta
  * @Description TODO
@@ -11,4 +15,10 @@ package input.store.region;
 * PD提取的类，保存的是整个Region Server的元数据*/
     //单独存起来
 public class RegionMeta {
+    /*fileCount,pageCount*/
+    byte[] MetaByte;
+    /*key(db+table+cf)---encodeNames()*/
+    /*encodeName---keyRange(startKey,endKey)*/
+    HashMap<byte[],byte[]> fileMap=new HashMap<>();
+    HashMap<byte[],byte[]> rangMap=new HashMap<>();
 }

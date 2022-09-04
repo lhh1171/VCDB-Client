@@ -21,10 +21,9 @@ public class FileStore {
      * data 存储多个kv对*/
     /*
      * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)包含RegionMeta (类）
-     * pageIndex
-     * MetaIndex int(每一个RegionMeta的物理地址,按照Key的顺序排列)(每个单位的大小固定)
-     * DataIndex int(每一个KV的物理地址)
      * CF_Meta      这个列族的元数据，包括列族的限制（ColumnFamilyCell）
+     * pageCount
+     * (pageIndex ,KVRange(startKey,endKey))
      * DataSet   (不分，一直往后累加，不用打乱排序）
      * */
 
@@ -56,7 +55,6 @@ public class FileStore {
         pos=Bytes.putBytes(this.data,pos,regionInfo.getData(),0,regionInfo.getRegionInfoLength());
         pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
         pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
-
         pos= Bytes.putInt(this.data,pos,dataSetCount);
         //获取key和value的set
         for (KV kv : dataSet) {
