@@ -23,10 +23,10 @@ public class FileStore {
      * Trailer (offset of other member)(根据offset,可以拿到整个region的大小)包含RegionMeta (类）
      * CF_Meta      这个列族的元数据，包括列族的限制（ColumnFamilyCell）
      * pageCount
-     * (pageIndex ,KVRange(startKey,endKey))
+     * pageIndex(KVRange(startKey,endKey))得固定
      * DataSet   (不分，一直往后累加，不用打乱排序）
      * */
-
+    //pageCountMax=2^31/2^11=2^20
     private byte[] data = null;
     private int length = 0;
 
@@ -42,11 +42,10 @@ public class FileStore {
 
     }
 
-
-
 //    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
+
     public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
         this.data = new byte[4 + regionInfo.getRegionInfoLength() + 4 + columnFamilyMeta.getLength() + 4 + 4 + dataSet.getByteSize()];
         int dataSetCount=dataSet.size();

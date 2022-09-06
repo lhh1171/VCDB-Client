@@ -9,4 +9,5 @@ public class VCLog {
    public VCLog(){
        entry=new HashMap<>();
    }
+
 }
