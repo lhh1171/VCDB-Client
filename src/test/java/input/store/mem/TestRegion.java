@@ -1,7 +1,7 @@
 package input.store.mem;
 
 import input.store.region.FileStore;
-import input.store.region.RegionInfo;
+import input.store.region.FileStoreMeta;
 import input.util.Bytes;
 import org.junit.Test;
 
@@ -31,12 +31,12 @@ public class TestRegion {
         System.out.println(cfMeta.getCf_name());
         System.out.println("===================================");
 
-        RegionInfo regionInfo=new RegionInfo((new Date()).getTime(),false,"/vcdb/re1","r1".getBytes(),"r2".getBytes(),"t1");
-        System.out.println(regionInfo.getTimeStamp());
-        System.out.println(regionInfo.isSplit());
-        System.out.println(regionInfo.getEncodedName());
-        System.out.println(Bytes.toString(regionInfo.getStartKey()) );
-        System.out.println(Bytes.toString(regionInfo.getEndKey()) );
+        FileStoreMeta fileStoreMeta =new FileStoreMeta((new Date()).getTime(),false,"/vcdb/re1","r1".getBytes(),"r2".getBytes(),"t1");
+        System.out.println(fileStoreMeta.getTimeStamp());
+        System.out.println(fileStoreMeta.isSplit());
+        System.out.println(fileStoreMeta.getEncodedName());
+        System.out.println(Bytes.toString(fileStoreMeta.getStartKey()) );
+        System.out.println(Bytes.toString(fileStoreMeta.getEndKey()) );
         byte[] row="row1".getBytes(StandardCharsets.UTF_8);
         byte[] family="fam1".getBytes(StandardCharsets.UTF_8);
         List<KV.ValueNode> values=new ArrayList<>();
@@ -52,13 +52,13 @@ public class TestRegion {
         kvs.add(kv);
 
         System.out.println("===================================");
-        FileStore fileStore=new FileStore(regionInfo,kvs,cfMeta);
-        RegionInfo regionInfo1 = fileStore.getRegionInfo();
-        System.out.println(regionInfo1.getTimeStamp());
-        System.out.println(regionInfo1.isSplit());
-        System.out.println(regionInfo1.getEncodedName());
-        System.out.println(Bytes.toString(regionInfo1.getStartKey()) );
-        System.out.println(Bytes.toString(regionInfo1.getEndKey()) );
+        FileStore fileStore=new FileStore(fileStoreMeta,kvs,cfMeta);
+        FileStoreMeta fileStoreMeta1 = fileStore.getRegionInfo();
+        System.out.println(fileStoreMeta1.getTimeStamp());
+        System.out.println(fileStoreMeta1.isSplit());
+        System.out.println(fileStoreMeta1.getEncodedName());
+        System.out.println(Bytes.toString(fileStoreMeta1.getStartKey()) );
+        System.out.println(Bytes.toString(fileStoreMeta1.getEndKey()) );
         System.out.println("===================================");
         KeyValueSkipListSet dataSet = fileStore.getDataSet();
         for (KV kv1:dataSet){

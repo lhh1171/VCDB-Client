@@ -1,6 +1,5 @@
 package input.store.region;
 
-import input.entity.Cell.ColumnFamilyCell;
 import input.store.mem.ColumnFamilyMeta;
 import input.store.mem.KV;
 import input.store.mem.KeyValueSkipListSet;
@@ -44,19 +43,19 @@ public class FileStore {
     public FileStore() {
 
     }
-    public FileStore(int pageCount,ColumnFamilyMeta columnFamilyMeta,RegionInfo regionInfo,List<KVRange> pageIndex,KeyValueSkipListSet dataSet) {
+    public FileStore(int pageCount, ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageIndex, KeyValueSkipListSet dataSet) {
 
     }
 //    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
 
-    public FileStore(RegionInfo regionInfo, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
-        this.data = new byte[4 + regionInfo.getRegionInfoLength() + 4 + columnFamilyMeta.getLength() + 4 + 4 + dataSet.getByteSize()];
+    public FileStore(FileStoreMeta fileStoreMeta, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
+        this.data = new byte[4 + fileStoreMeta.getRegionInfoLength() + 4 + columnFamilyMeta.getLength() + 4 + 4 + dataSet.getByteSize()];
         int dataSetCount=dataSet.size();
         int pos=0;
-        pos= Bytes.putInt(this.data,pos,regionInfo.getRegionInfoLength());
-        pos=Bytes.putBytes(this.data,pos,regionInfo.getData(),0,regionInfo.getRegionInfoLength());
+        pos= Bytes.putInt(this.data,pos, fileStoreMeta.getRegionInfoLength());
+        pos=Bytes.putBytes(this.data,pos, fileStoreMeta.getData(),0, fileStoreMeta.getRegionInfoLength());
         pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
         pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
         pos= Bytes.putInt(this.data,pos,dataSetCount);
@@ -70,8 +69,8 @@ public class FileStore {
     public int getRegionInfoLength(){
         return Bytes.toInt(this.data,0,4);
     }
-    public RegionInfo getRegionInfo(){
-        return new RegionInfo(Bytes.subByte(this.data,4,getRegionInfoLength()));
+    public FileStoreMeta getRegionInfo(){
+        return new FileStoreMeta(Bytes.subByte(this.data,4,getRegionInfoLength()));
     }
     public int getMetaLength(){
         return Bytes.toInt(this.data,4+getRegionInfoLength(),4);

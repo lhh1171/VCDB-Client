@@ -3,7 +3,7 @@ package input.store.region;
 import input.util.Bytes;
 
 //存储a region的具体信息(元数据)
-public class RegionInfo {
+public class FileStoreMeta {
 
 //    //Region 创建的时间戳
 //    long timeStamp;
@@ -16,11 +16,11 @@ public class RegionInfo {
     private final byte[] data;
     private int regionInfoLength = 0;
 
-    public RegionInfo(byte[] data){
+    public FileStoreMeta(byte[] data){
         this.data=data;
         this.regionInfoLength=data.length;
     }
-    public RegionInfo(long timeStamp, boolean split, String encodedName, byte[] endKey, byte[] startKey, String tableName) {
+    public FileStoreMeta(long timeStamp, boolean split, String encodedName, byte[] endKey, byte[] startKey, String tableName) {
         this.regionInfoLength = 8 + 1 + 4 + encodedName.getBytes().length + 4 + endKey.length + 4 + startKey.length + 4 + tableName.getBytes().length;
         byte spl=0;
         if (split){
