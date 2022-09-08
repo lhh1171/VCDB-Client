@@ -46,10 +46,18 @@ public class FileStore {
     }
 
     public int getPageTrailerLength(List<KVRange> pageTrailer) {
-        return 99;
+        int count=0;
+        for (KVRange kvRange:pageTrailer){
+            count+=4+kvRange.getLength();
+        }
+        return count;
     }
 
-    public FileStore(Trailer trailer, ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
+    public FileStore( ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
+        //分页管理可以改变trailer的参数
+        Trailer trailer=new Trailer(4*4,4*4+4+columnFamilyMeta.getLength(),
+                4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength(),
+                4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength()+4+getPageTrailerLength(pageTrailer));
         this.data = new byte[4 * 4 + 4 + columnFamilyMeta.getLength() + 4 + fileStoreMeta.getLength() + 4 + getPageTrailerLength(pageTrailer) + 4 + dataSet.getByteSize()];
         int pos = 0;
         pos = Bytes.putInt(this.data, pos, trailer.getColumnMetaIndex());
