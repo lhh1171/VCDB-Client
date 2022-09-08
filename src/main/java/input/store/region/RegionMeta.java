@@ -16,7 +16,7 @@ import java.util.HashMap;
     //单独存起来
 public class RegionMeta {
 
-    /*fileCount,pageCount*/
+    /*fileCount,pageCount,metaName,fileMap,rangMap*/
     byte[] MetaByte;
     /*key(db+table+cf)---encodeNames(fileCount{(nameLength,name).....})*/
     /*encodeName---keyRange(startKey,endKey)*/

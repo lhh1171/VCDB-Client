@@ -5,6 +5,7 @@ import input.store.mem.KV;
 import input.store.mem.KeyValueSkipListSet;
 import input.util.Bytes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,21 +44,26 @@ public class FileStore {
     public FileStore() {
 
     }
-    public FileStore(int pageCount, ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageIndex, KeyValueSkipListSet dataSet) {
-
+    public int getPageTrailerLength(List<KVRange> pageTrailer){
+        return 99;
     }
-//    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
-//        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
-//    }
-
-    public FileStore(FileStoreMeta fileStoreMeta, KeyValueSkipListSet dataSet, ColumnFamilyMeta columnFamilyMeta) {
-        this.data = new byte[4 + fileStoreMeta.getRegionInfoLength() + 4 + columnFamilyMeta.getLength() + 4 + 4 + dataSet.getByteSize()];
-        int dataSetCount=dataSet.size();
+    public FileStore(Trailer trailer, ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
+        this.data=new byte[4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength()+4+getPageTrailerLength(pageTrailer)+4+dataSet.getByteSize()];
         int pos=0;
-        pos= Bytes.putInt(this.data,pos, fileStoreMeta.getRegionInfoLength());
-        pos=Bytes.putBytes(this.data,pos, fileStoreMeta.getData(),0, fileStoreMeta.getRegionInfoLength());
+        pos=Bytes.putInt(this.data,pos,trailer.getColumnMetaIndex());
+        pos=Bytes.putInt(this.data,pos,trailer.getRegionInfoIndex());
+        pos=Bytes.putInt(this.data,pos,trailer.getPageTrailerIndex());
+        pos=Bytes.putInt(this.data,pos,trailer.getDataSetIndex());
         pos= Bytes.putInt(this.data,pos,columnFamilyMeta.getLength());
         pos=Bytes.putBytes(this.data,pos,columnFamilyMeta.getData(),0,columnFamilyMeta.getLength());
+        pos= Bytes.putInt(this.data,pos, fileStoreMeta.getLength());
+        pos=Bytes.putBytes(this.data,pos, fileStoreMeta.getData(),0, fileStoreMeta.getLength());
+        pos= Bytes.putInt(this.data,pos, pageTrailer.size());
+        for(KVRange kvRange:pageTrailer){
+            pos= Bytes.putInt(this.data,pos, kvRange.getLength());
+            pos=Bytes.putBytes(this.data,pos, kvRange.getData(),0, kvRange.getLength());
+        }
+        int dataSetCount=dataSet.size();
         pos= Bytes.putInt(this.data,pos,dataSetCount);
         //获取key和value的set
         for (KV kv : dataSet) {
@@ -66,30 +72,42 @@ public class FileStore {
         }
         this.length=this.data.length;
     }
-    public int getRegionInfoLength(){
-        return Bytes.toInt(this.data,0,4);
+//    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
+//        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
+//    }
+    public Trailer getTrailer(){
+        return new Trailer(Bytes.toInt(this.data,0,4),
+                Bytes.toInt(this.data,4,4),
+                Bytes.toInt(this.data,8,4),
+                Bytes.toInt(this.data,12,4));
     }
-    public FileStoreMeta getRegionInfo(){
-        return new FileStoreMeta(Bytes.subByte(this.data,4,getRegionInfoLength()));
+    public int getColumnFamilyMetaLength(){
+        return Bytes.toInt(this.data,16,4);
     }
-    public int getMetaLength(){
-        return Bytes.toInt(this.data,4+getRegionInfoLength(),4);
+    public byte[] getColumnFamilyMeta(){
+        return Bytes.subByte(this.data,20,getColumnFamilyMetaLength());
     }
-    public ColumnFamilyMeta getMeta(){
-        return new ColumnFamilyMeta(Bytes.subByte(this.data,8+getRegionInfoLength(),getMetaLength()));
+    public int getFileStoreMetaLength(){
+        return Bytes.toInt(this.data,20+getColumnFamilyMetaLength(),4);
     }
-    public int getDataSetCount(){
-        return Bytes.toInt(this.data,8+getRegionInfoLength()+getMetaLength(),4);
+    public byte[] getFileStoreMeta(){
+        return Bytes.subByte(this.data,24+getColumnFamilyMetaLength(),getColumnFamilyMetaLength());
+    }
+    public List<KVRange> getPageTrailer(){
+        List<KVRange> pageTrailer=new ArrayList<>();
+        int pos=24+getColumnFamilyMetaLength()+getColumnFamilyMetaLength();
+        int kvRangeCount=Bytes.toInt(this.data,pos,4);
+        pos+=4;
+        for (int i = 0; i < kvRangeCount; i++) {
+            int rangeLength=Bytes.toInt(this.data,pos,4);
+            pos+=4;
+            pageTrailer.add(new KVRange(Bytes.subByte(this.data,pos,rangeLength)));
+            pos+=rangeLength;
+        }
+        return pageTrailer;
     }
     public KeyValueSkipListSet getDataSet(){
-        KeyValueSkipListSet kvs = new KeyValueSkipListSet(new KV.KVComparator());
-        int pos=4+getRegionInfoLength()+4+getMetaLength()+4;
-        for (int i = 0; i < getDataSetCount(); i++) {
-            int kvLength=Bytes.toInt(this.data,pos,4);
-            pos+=4;
-            kvs.add(new KV(Bytes.subByte(this.data,pos,kvLength)));
-            pos+=kvLength;
-        }
-        return kvs;
+
+        return null;
     }
 }

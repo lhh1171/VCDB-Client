@@ -14,43 +14,43 @@ public class FileStoreMeta {
 //    private byte[] startKey;
 //    private String tableName = null;
     private final byte[] data;
-    private int regionInfoLength = 0;
+    private int length = 0;
 
     public FileStoreMeta(byte[] data){
         this.data=data;
-        this.regionInfoLength=data.length;
+        this.length =data.length;
     }
     public FileStoreMeta(long timeStamp, boolean split, String encodedName, byte[] endKey, byte[] startKey, String tableName) {
-        this.regionInfoLength = 8 + 1 + 4 + encodedName.getBytes().length + 4 + endKey.length + 4 + startKey.length + 4 + tableName.getBytes().length;
+        this.length = 8 + 1 + 4 + encodedName.getBytes().length + 4 + startKey.length + 4 + endKey.length  + 4 + tableName.getBytes().length;
         byte spl=0;
         if (split){
             spl=1;
         }
         this.data=createByteArray(timeStamp,spl,encodedName,endKey,startKey,tableName);
-        this.regionInfoLength=this.data.length;
+        this.length =this.data.length;
     }
     public byte[] getData() {
         return data;
     }
-    public int getRegionInfoLength() {
-        return regionInfoLength;
+    public int getLength() {
+        return length;
     }
     private byte[] createByteArray(long timeStamp, byte spl,
                                    String encodedName, byte[] endKey,
                                    byte[] startKey, String tableName) {
         int pos=0;
-        byte[] bytes = new byte[8+1+4+encodedName.getBytes().length+4+endKey.length+4+startKey.length+4+tableName.getBytes().length];
+        byte[] bytes = new byte[8+1+4+encodedName.getBytes().length+4+startKey.length+4+endKey.length+4+tableName.getBytes().length];
         pos=Bytes.putLong(bytes,pos,timeStamp);
         pos= Bytes.putByte(bytes,pos,spl);
 
         pos=Bytes.putInt(bytes,pos,encodedName.getBytes().length);
         pos=Bytes.putBytes(bytes,pos,encodedName.getBytes(),0,encodedName.getBytes().length);
 
-        pos=Bytes.putInt(bytes,pos,endKey.length);
-        pos=Bytes.putBytes(bytes,pos,endKey,0,endKey.length);
-
         pos=Bytes.putInt(bytes,pos,startKey.length);
         pos=Bytes.putBytes(bytes,pos,startKey,0,startKey.length);
+
+        pos=Bytes.putInt(bytes,pos,endKey.length);
+        pos=Bytes.putBytes(bytes,pos,endKey,0,endKey.length);
 
         pos=Bytes.putInt(bytes,pos,tableName.getBytes().length);
         pos=Bytes.putBytes(bytes,pos,tableName.getBytes(),0,tableName.getBytes().length);
@@ -72,18 +72,19 @@ public class FileStoreMeta {
     public String getEncodedName() {
         return Bytes.toString(this.data,13,getNameLength());
     }
-    public int getEndKeyLength() {
+    public int getStartKeyLength() {
         return Bytes.toInt(this.data,13+getNameLength(),4);
     }
-    public byte[] getEndKey() {
-        return Bytes.subByte(this.data,17+getNameLength(),getEndKeyLength());
-    }
-    public int getStartKeyLength(){
-        return Bytes.toInt(this.data,17+getNameLength()+getEndKeyLength(),4);
-    }
     public byte[] getStartKey() {
-        return Bytes.subByte(this.data,21+getNameLength()+getEndKeyLength(),getStartKeyLength());
+        return Bytes.subByte(this.data,17+getNameLength(),getStartKeyLength());
     }
+    public int getEndKeyLength(){
+        return Bytes.toInt(this.data,17+getNameLength()+getStartKeyLength(),4);
+    }
+    public byte[] getEndKey() {
+        return Bytes.subByte(this.data,21+getNameLength()+getStartKeyLength(),getEndKeyLength());
+    }
+
     public int getTableNameLength(){
         return Bytes.toInt(this.data,21+getNameLength()+getEndKeyLength()+getStartKeyLength(),4);
     }
