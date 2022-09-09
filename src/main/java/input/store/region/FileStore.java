@@ -53,17 +53,17 @@ public class FileStore {
         return count;
     }
 
-    public FileStore( ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta, List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
-        //分页管理可以改变trailer的参数
-        Trailer trailer=new Trailer(4*4,4*4+4+columnFamilyMeta.getLength(),
-                4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength(),
-                4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength()+4+getPageTrailerLength(pageTrailer));
-        this.data = new byte[4 * 4 + 4 + columnFamilyMeta.getLength() + 4 + fileStoreMeta.getLength() + 4 + getPageTrailerLength(pageTrailer) + 4 + dataSet.getByteSize()];
-        int pos = 0;
-        pos = Bytes.putInt(this.data, pos, trailer.getColumnMetaIndex());
-        pos = Bytes.putInt(this.data, pos, trailer.getRegionInfoIndex());
-        pos = Bytes.putInt(this.data, pos, trailer.getPageTrailerIndex());
-        pos = Bytes.putInt(this.data, pos, trailer.getDataSetIndex());
+    public byte[] getHeadPage(){
+        Trailer trailer = getTrailer();
+        int dataSetIndex = trailer.getDataSetIndex();
+        return Bytes.subByte(this.data,0,dataSetIndex);
+    }
+
+    public FileStore( ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta,
+                      List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
+        //fileStoreMeta也会随时更新
+        this.data = new byte[4*1024*16];
+        int pos = 16;
         pos = Bytes.putInt(this.data, pos, columnFamilyMeta.getLength());
         pos = Bytes.putBytes(this.data, pos, columnFamilyMeta.getData(), 0, columnFamilyMeta.getLength());
         pos = Bytes.putInt(this.data, pos, fileStoreMeta.getLength());
@@ -73,6 +73,15 @@ public class FileStore {
             pos = Bytes.putInt(this.data, pos, kvRange.getLength());
             pos = Bytes.putBytes(this.data, pos, kvRange.getData(), 0, kvRange.getLength());
         }
+        pos=(pos%1024+1)*1024;
+        //分页管理可以改变trailer的参数
+        Trailer trailer=new Trailer(4*4,4*4+4+columnFamilyMeta.getLength(),
+                4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength(),
+                pos);
+        Bytes.putInt(this.data, 0, trailer.getColumnMetaIndex());
+        Bytes.putInt(this.data, 4, trailer.getRegionInfoIndex());
+        Bytes.putInt(this.data, 8, trailer.getPageTrailerIndex());
+        Bytes.putInt(this.data, 12, trailer.getDataSetIndex());
         int dataSetCount = dataSet.size();
         pos = Bytes.putInt(this.data, pos, dataSetCount);
         //获取key和value的set
@@ -83,7 +92,7 @@ public class FileStore {
         this.length = this.data.length;
     }
 
-    //    public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
+//        public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
     public Trailer getTrailer() {
