@@ -73,9 +73,11 @@ public class FileStore {
             pos = Bytes.putInt(this.data, pos, kvRange.getLength());
             pos = Bytes.putBytes(this.data, pos, kvRange.getData(), 0, kvRange.getLength());
         }
-        pos=(pos%1024+1)*1024;
+        pos=(pos%(1024*4)+1)*(1024*4);
         //分页管理可以改变trailer的参数
-        Trailer trailer=new Trailer(4*4,4*4+4+columnFamilyMeta.getLength(),
+        Trailer trailer=new Trailer(
+                4*4,
+                4*4+4+columnFamilyMeta.getLength(),
                 4*4+4+columnFamilyMeta.getLength()+4+fileStoreMeta.getLength(),
                 pos);
         Bytes.putInt(this.data, 0, trailer.getColumnMetaIndex());
@@ -95,6 +97,10 @@ public class FileStore {
 //        public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
+    public boolean isSplitHeadPage(byte[] insertData) {
+        return insertData.length < this.data.length % ((1024 * 4));
+    }
+
     public Trailer getTrailer() {
         return new Trailer(Bytes.toInt(this.data, 0, 4),
                 Bytes.toInt(this.data, 4, 4),
@@ -132,7 +138,30 @@ public class FileStore {
         }
         return pageTrailer;
     }
+    public void setRegionInfoIndex(){
 
+    }
+    public void setTrailerIndex(){
+
+    }
+    public void setDataSetIndex(){
+
+    }
+    public void setColumnMetaIndex(){
+
+    }
+    public void updateColumnFamilyMeta(byte[] headPage){
+
+    }
+    public void updateFileStoreMeta(byte[] headPage){
+
+    }
+    public void updatePageTrailer(byte[] headPage){
+
+    }
+    public void addData(KV kv){
+
+    }
     public KeyValueSkipListSet getDataSet() {
         Trailer trailer = getTrailer();
         int pos = trailer.getDataSetIndex();
@@ -147,4 +176,5 @@ public class FileStore {
         }
         return kvs;
     }
+
 }
