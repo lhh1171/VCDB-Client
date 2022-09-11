@@ -97,8 +97,9 @@ public class FileStore {
 //        public FileStore(RegionInfo regionInfo, int dataIndexOffset, int metaIndexOffset, int MetaSetOffset, int DataSetOffset) {
 //        this.data = new byte[regionInfo.getRegionInfoLength() + regionInfo.getRegionInfoLengthSize() + 4 + 4 + 4 + 4];
 //    }
-    public boolean isSplitHeadPage(byte[] insertData) {
-        return insertData.length < this.data.length % ((1024 * 4));
+    public boolean isSplitHeadPage(int length) {
+        int headEnd=getRegionInfoIndex()+ getPageTrailerLength(getPageTrailer());
+        return (length + (headEnd) % ((1024 * 4)))/(1024*4)!=0;
     }
 
     public Trailer getTrailer() {
@@ -138,28 +139,54 @@ public class FileStore {
         }
         return pageTrailer;
     }
-    public void setRegionInfoIndex(){
+
+    public int getColumnMetaIndex(){
+        return Bytes.toInt(this.data,0,4);
+    }
+    public int getRegionInfoIndex(){
+        return Bytes.toInt(this.data,4,4);
+    }
+    public int getTrailerIndex(){
+        return Bytes.toInt(this.data,8,4);
+    }
+    public int getDataSetIndex(){
+        return Bytes.toInt(this.data,12,4);
+    }
+
+    /*----------------------------------------------------*/
+
+    public void setColumnMetaIndex(int offset){
+        Bytes.putInt(this.data, 0, offset);
+    }
+
+    public void setRegionInfoIndex(int offset){
+        Bytes.putInt(this.data, 4, offset);
+    }
+
+    public void setTrailerIndex(int offset){
+        Bytes.putInt(this.data, 8, offset);
+    }
+
+    public void setDataSetIndex(int offset){
+        Bytes.putInt(this.data, 12, offset);
+    }
+
+    public void updateColumnFamilyMeta(ColumnFamilyMeta columnFamilyMeta){
+        int columnFamilyMetaIndex=getColumnMetaIndex();
+        byte[] oldHeadPage=getHeadPage();
 
     }
-    public void setTrailerIndex(){
+    public void updateFileStoreMeta(FileStoreMeta fileStoreMeta){
+        int fileStoreMetaIndex=getRegionInfoIndex();
 
     }
-    public void setDataSetIndex(){
+    public void updatePageTrailer(KVRange kvRange){
+        int pageTrailer=getTrailerIndex();
 
     }
-    public void setColumnMetaIndex(){
-
-    }
-    public void updateColumnFamilyMeta(byte[] headPage){
-
-    }
-    public void updateFileStoreMeta(byte[] headPage){
-
-    }
-    public void updatePageTrailer(byte[] headPage){
-
-    }
-    public void addData(KV kv){
+    //update/add
+    public void setData(KV kv){
+        int dataSetIndex=getDataSetIndex();
 
     }
     public KeyValueSkipListSet getDataSet() {
