@@ -3,7 +3,6 @@ package input.executor;
 import input.entity.Delete.DeleteCells;
 import input.entity.Delete.DeleteTable;
 import input.entity.Post.*;
-import input.entity.Put.CreateDB;
 import input.entity.Put.CreateTable;
 import input.store.mem.KV;
 import input.store.mem.MemStore;
@@ -26,16 +25,19 @@ public class VCDBAdmin {
         if (walEdit==null){
             VCLog.entry.put(dBName.getBytes(),new WalEdit());
         }
+        //日志集合（内存）
         WalEdit  newWalEdit = VCLog.entry.get(dBName.getBytes());
         newWalEdit.actions.add(valueNode);
-        if (memStore.kvset.get("")==null){
+        if (memStore.kvSet.get("")==null){
             memStore.add(new KV("".getBytes(),0,"".getBytes().length,"".getBytes(),0,"".getBytes().length,null));
         }
-        KV kv=memStore.kvset.get("");
+        //产生新KV加入memStore
+        KV kv=memStore.kvSet.get("");
         List<KV.ValueNode> values = kv.getValues();
         values.add(valueNode);
-        memStore.kvset.remove(kv);
-        KV newKv=new KV("".getBytes(),0,"".getBytes().length,"".getBytes(),0,"".getBytes().length,values);
+        memStore.kvSet.remove(kv);
+        KV newKv=new KV("".getBytes(),0,"".getBytes().length,
+                "".getBytes(),0,"".getBytes().length,values);
         memStore.add(newKv);
     }
 

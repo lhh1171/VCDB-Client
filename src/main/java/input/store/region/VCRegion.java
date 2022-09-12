@@ -21,6 +21,6 @@ Region               (Regions for the table)
 public class VCRegion {
     RegionMeta regionMeta;
     //regionID,VCRegionStores
-    byte[] regionWServerID;
+    byte[] regionServerID;
     List<FileStore> fileStores;
 }

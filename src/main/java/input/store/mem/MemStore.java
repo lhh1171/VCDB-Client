@@ -7,14 +7,14 @@ public class MemStore {
 
     // Used to track when to flush
     long timeOfOldestEdit = Long.MAX_VALUE;
+    //lock for memStore version
     AtomicLong size;
-    public KeyValueSkipListSet kvset;
-
+    public KeyValueSkipListSet kvSet;
     // Snapshot of memStore.  Made for flusher.
     volatile KeyValueSkipListSet snapshot;
     public MemStore(){
         size=new AtomicLong(0);
-        kvset=new KeyValueSkipListSet(new KV.KVComparator());
+        kvSet =new KeyValueSkipListSet(new KV.KVComparator());
     }
 
     public long add(final KV kv) {
@@ -31,13 +31,13 @@ public class MemStore {
     }
 
     private boolean addToKVSet(KV e) {
-        boolean b = this.kvset.add(e);
+        boolean b = this.kvSet.add(e);
         setOldestEditTimeToNow();
         return b;
     }
 
     private boolean removeFromKVSet(KV e) {
-        boolean b = this.kvset.remove(e);
+        boolean b = this.kvSet.remove(e);
         setOldestEditTimeToNow();
         return b;
     }

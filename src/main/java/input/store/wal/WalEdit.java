@@ -9,5 +9,6 @@ public class WalEdit {
     public WalEdit(){
         actions=new ArrayList<>();
     }
+    /*落盘操作*/
     public void syncLog(){}
 }

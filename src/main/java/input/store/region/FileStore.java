@@ -36,13 +36,8 @@ public class FileStore {
     public byte[] getData() {
         return data;
     }
-
     public int getLength() {
         return length;
-    }
-
-    public FileStore() {
-
     }
 
     public int getPageTrailerLength(List<KVRange> pageTrailer) {
@@ -59,6 +54,10 @@ public class FileStore {
         return Bytes.subByte(this.data,0,dataSetIndex);
     }
 
+    public FileStore(byte[] data){
+        this.data=data;
+        this.length=data.length;
+    }
     public FileStore( ColumnFamilyMeta columnFamilyMeta, FileStoreMeta fileStoreMeta,
                       List<KVRange> pageTrailer, KeyValueSkipListSet dataSet) {
         //fileStoreMeta也会随时更新
@@ -184,11 +183,17 @@ public class FileStore {
         int pageTrailer=getTrailerIndex();
 
     }
+    //DataChannel<=============>fileStore
     //update/add
     public void setData(KV kv){
         int dataSetIndex=getDataSetIndex();
-
+        int pageIndex = getPageByKV(kv);
     }
+
+    private int getPageByKV(KV kv) {
+        return 99;
+    }
+
     public KeyValueSkipListSet getDataSet() {
         Trailer trailer = getTrailer();
         int pos = trailer.getDataSetIndex();
